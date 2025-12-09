@@ -249,8 +249,8 @@
             border: 2px solid #808080;
             border-bottom: 2px solid #fff;
             border-right: 2px solid #fff;
-            margin-bottom: 25px; /* Jarak antar kolom lebih lega */
-            padding: 25px 15px 15px 15px; /* Padding atas ditambah agar tidak jepit legend */
+            margin-bottom: 25px; 
+            padding: 25px 15px 15px 15px; 
             box-shadow: -1px -1px 0 #000;
             position: relative;
             background: transparent;
@@ -261,12 +261,8 @@
             font-family: var(--font-pixel-text);
             font-size: 1.4rem;
             color: #000080;
-            font-weight: bold; /* Judul menjadi Bold */
-            
-            /* Trik agar garis tidak menabrak teks: beri background */
+            font-weight: bold; 
             background-color: var(--win-bg); 
-            
-            /* Gaya tambahan agar legend terlihat seperti label stiker */
             border: 1px solid #fff;
             border-right: 1px solid #808080;
             border-bottom: 1px solid #808080;
@@ -354,34 +350,35 @@
             flex-shrink: 0; font-family: var(--font-pixel-text); color: #333;
         }
 
-        /* --- MODIFIKASI STRUK / RECEIPT --- */
+        /* --- MODIFIKASI STRUK / RECEIPT (UPDATED) --- */
         #receipt-hidden {
             display: none; 
-            width: 320px; /* Lebar disesuaikan standar struk */
+            /* Ukuran diset 74mm agar pas di kertas thermal 80mm dg sedikit margin */
+            width: 74mm; 
             background-color: #fff;
-            padding: 20px;
-            font-family: 'VT323', monospace; /* Font struk */
+            padding: 10px;
+            font-family: 'VT323', monospace; 
             font-size: 18px;
             color: #000;
             line-height: 1.2;
             box-sizing: border-box;
             border: 1px solid #eee;
+            margin: 0 auto; /* Trik centering */
         }
 
         .receipt-center { text-align: center; }
         .receipt-line { display: flex; justify-content: space-between; margin-bottom: 3px; }
         
-        /* Garis putus-putus nyata */
         .receipt-divider { border-bottom: 2px dashed #000; margin: 10px 0; display: block; height: 1px; }
         .receipt-divider-double { border-bottom: 4px double #000; margin: 10px 0; }
         
-        /* Title Struk sesuai Logo Halaman Awal */
-        .receipt-title { 
-            font-size: 20px; 
-            margin-bottom: 10px; 
-            font-family: 'Press Start 2P', cursive; /* Sama dengan logo */
-            line-height: 1.5;
-            text-transform: uppercase;
+        /* Style untuk Logo di Struk */
+        .receipt-logo-img {
+            display: block;
+            margin: 0 auto 5px auto;
+            max-width: 85%; /* Agar tidak terlalu lebar */
+            height: auto;
+            image-rendering: pixelated;
         }
         
         .receipt-section { margin-top: 15px; text-transform: uppercase; font-weight: bold; border-bottom: 1px solid #000; display: inline-block; margin-bottom: 5px;}
@@ -415,7 +412,7 @@
 </head>
 <body>
 
-    <div id="receipt-container" style="position: absolute; top: -9999px; left: -9999px;">
+    <div id="receipt-container" style="position: fixed; top: -10000px; left: -10000px;">
         <div id="receipt-hidden"></div>
     </div>
 
@@ -475,7 +472,7 @@
                     <fieldset>
                         <legend>2. Kewajiban & Hutang</legend>
                         <div class="form-row">
-                            <label>Cicilan:</label>
+                            <label>Cicilan Kendaraan:</label>
                             <input type="text" class="money-input debt" placeholder="0">
                         </div>
                         <div class="form-row">
@@ -820,8 +817,9 @@
             
             const randomMsg = getRandomMessage(statusCode);
 
+            // MENGGUNAKAN LOGO IMG DI SINI
             let receiptHTML = `
-                <div class="receipt-center receipt-title">ariezona_budget_logo.png</div>
+                <img src="ariezona_budget_logo.png" alt="ARIEZONA LOGO" class="receipt-logo-img">
                 <div class="receipt-center">v.2.4 (Win95 Edition)</div>
                 <div class="receipt-divider"></div>
                 <div class="receipt-line"><span>Date:</span><span>${now.toLocaleDateString('id-ID')}</span></div>
