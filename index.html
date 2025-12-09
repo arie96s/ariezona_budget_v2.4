@@ -244,7 +244,7 @@
             scrollbar-color: #808080 #c0c0c0;
         }
         
-        /* --- FORM STYLES (MODIFIED) --- */
+        /* --- FORM STYLES --- */
         fieldset {
             border: 2px solid #808080;
             border-bottom: 2px solid #fff;
@@ -350,47 +350,49 @@
             flex-shrink: 0; font-family: var(--font-pixel-text); color: #333;
         }
 
-        /* --- MODIFIKASI STRUK / RECEIPT (UPDATED) --- */
+        /* --- MODIFIKASI STRUK / RECEIPT (PERBAIKAN CSS PDF) --- */
         #receipt-hidden {
             display: none; 
-            /* Ukuran diset 74mm agar pas di kertas thermal 80mm dg sedikit margin */
-            width: 74mm; 
+            /* Lebar disesuaikan dengan kertas 80mm (~75mm content untuk safety) */
+            width: 75mm; 
+            margin: 0 auto; /* Posisi Center */
             background-color: #fff;
             padding: 10px;
             font-family: 'VT323', monospace; 
-            font-size: 18px;
+            font-size: 16px; /* Font agak dikecilkan dikit agar muat */
             color: #000;
             line-height: 1.2;
             box-sizing: border-box;
-            border: 1px solid #eee;
-            margin: 0 auto; /* Trik centering */
+            border: 1px solid #eee; /* Border preview saja */
         }
 
         .receipt-center { text-align: center; }
         .receipt-line { display: flex; justify-content: space-between; margin-bottom: 3px; }
         
+        /* Garis putus-putus nyata */
         .receipt-divider { border-bottom: 2px dashed #000; margin: 10px 0; display: block; height: 1px; }
         .receipt-divider-double { border-bottom: 4px double #000; margin: 10px 0; }
         
-        /* Style untuk Logo di Struk */
-        .receipt-logo-img {
-            display: block;
-            margin: 0 auto 5px auto;
-            max-width: 85%; /* Agar tidak terlalu lebar */
-            height: auto;
-            image-rendering: pixelated;
-        }
-        
         .receipt-section { margin-top: 15px; text-transform: uppercase; font-weight: bold; border-bottom: 1px solid #000; display: inline-block; margin-bottom: 5px;}
-        .receipt-total { font-size: 22px; margin-top: 5px; font-weight: bold; }
+        .receipt-total { font-size: 20px; margin-top: 5px; font-weight: bold; }
         .receipt-message {
             margin-top: 20px;
             text-align: center;
-            font-size: 16px;
+            font-size: 14px;
             font-style: italic;
             border: 2px solid #000;
             padding: 5px;
             border-radius: 5px;
+        }
+
+        /* LOGO STRUK STYLE */
+        .receipt-logo-img {
+            width: 60%; /* Ukuran logo di struk */
+            height: auto;
+            margin: 0 auto 5px auto;
+            display: block;
+            /* Filter Hitam Putih ala Thermal Printer */
+            filter: grayscale(100%) contrast(150%);
         }
 
         @media print {
@@ -412,7 +414,7 @@
 </head>
 <body>
 
-    <div id="receipt-container" style="position: fixed; top: -10000px; left: -10000px;">
+    <div id="receipt-container" style="position: absolute; top: -9999px; left: -9999px;">
         <div id="receipt-hidden"></div>
     </div>
 
@@ -817,9 +819,11 @@
             
             const randomMsg = getRandomMessage(statusCode);
 
-            // MENGGUNAKAN LOGO IMG DI SINI
+            // Perbaikan: Ganti Judul Text dengan Gambar Logo
             let receiptHTML = `
-                <img src="ariezona_budget_logo.png" alt="ARIEZONA LOGO" class="receipt-logo-img">
+                <div class="receipt-center">
+                    <img src="ariezona_budget_logo.png" alt="Logo" class="receipt-logo-img">
+                </div>
                 <div class="receipt-center">v.2.4 (Win95 Edition)</div>
                 <div class="receipt-divider"></div>
                 <div class="receipt-line"><span>Date:</span><span>${now.toLocaleDateString('id-ID')}</span></div>
@@ -876,12 +880,13 @@
             receiptDiv.innerHTML = receiptHTML;
             receiptDiv.style.display = 'block';
 
+            // Konfigurasi html2pdf agar pas di tengah kertas 80mm
             const opt = {
-                margin:       0,
+                margin:       0, // Nol margin agar CSS yang mengatur posisi
                 filename:     `Struk_Ariezona_${userName}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
-                jsPDF:        { unit: 'mm', format: [80, 297] } 
+                html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
+                jsPDF:        { unit: 'mm', format: [80, 297] } // Format thermal roll
             };
 
             html2pdf().set(opt).from(receiptDiv).save().then(() => {
