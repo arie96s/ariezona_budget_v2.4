@@ -23,9 +23,8 @@
 
         body {
             background-color: var(--desktop);
-            /* Mengubah font global jadi 8-bit */
             font-family: var(--font-pixel-text); 
-            font-size: 1.3rem; /* Sedikit diperbesar agar font pixel terbaca jelas */
+            font-size: 1.3rem;
             margin: 0;
             height: 100vh;
             width: 100vw;
@@ -33,7 +32,7 @@
             justify-content: center;
             align-items: center;
             overflow: hidden;
-            -webkit-font-smoothing: none; /* Mematikan antialiasing agar tajam */
+            -webkit-font-smoothing: none;
         }
 
         /* --- LANDING SEARCH PAGE --- */
@@ -47,13 +46,11 @@
             gap: 15px;
         }
 
-        /* Logo Image Style */
         .pixel-logo {
             max-width: 80%;
             height: auto;
-            /* Bayangan hitam tajam (Hard Shadow) */
             filter: drop-shadow(6px 6px 0px #000000); 
-            image-rendering: pixelated; /* Agar gambar tidak blur saat di resize */
+            image-rendering: pixelated;
             margin-bottom: 5px;
         }
 
@@ -89,9 +86,7 @@
             box-shadow: inset 2px 2px 0px #000;
         }
         
-        .search-input::placeholder {
-            color: #808080;
-        }
+        .search-input::placeholder { color: #808080; }
 
         .btn-win95 {
             background: #c0c0c0;
@@ -102,11 +97,11 @@
             padding: 5px 15px;
             cursor: pointer;
             margin-left: 5px;
-            font-family: var(--font-pixel-header); /* Tombol pakai font header biar tebal */
+            font-family: var(--font-pixel-header);
             font-size: 10px;
             color: black;
             outline: none;
-            box-shadow: 2px 2px 0px #000; /* Shadow tombol lebih tegas */
+            box-shadow: 2px 2px 0px #000;
         }
 
         .btn-win95:active {
@@ -132,7 +127,7 @@
         .btn-small-add:hover { background: #006060; }
         .btn-small-add:disabled { background: #808080; cursor: not-allowed; }
 
-        /* --- WINDOWS 95 POPUP MODAL --- */
+        /* --- MODAL --- */
         #win95-modal-overlay {
             display: none;
             position: fixed;
@@ -167,7 +162,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-family: var(--font-pixel-text);
         }
 
         .popup-close-x {
@@ -186,39 +180,18 @@
             font-weight: bold;
         }
 
-        .popup-body {
-            padding: 15px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
+        .popup-body { padding: 15px; display: flex; align-items: center; gap: 15px; }
         .warning-icon {
-            width: 32px;
-            height: 32px;
-            background: #ffff00;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 24px;
-            font-weight: bold;
-            border: 2px solid #000;
-            font-family: serif;
+            width: 32px; height: 32px; background: #ffff00; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 24px; font-weight: bold; border: 2px solid #000; font-family: serif;
         }
+        .popup-footer { display: flex; justify-content: center; padding-bottom: 15px; }
 
-        .popup-footer {
-            display: flex;
-            justify-content: center;
-            padding-bottom: 15px;
-        }
-
-        /* --- MAIN CALCULATOR WINDOW --- */
+        /* --- MAIN WINDOW --- */
         #main-window {
             display: none;
-            width: 0;
-            height: 0;
-            opacity: 0;
+            width: 0; height: 0; opacity: 0;
             background: var(--win-bg);
             border: 2px solid #fff;
             box-shadow: 6px 6px 0 #000;
@@ -231,35 +204,19 @@
             max-height: 92vh; 
         }
 
-        .smooth-transition {
-            transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-        }
+        .smooth-transition { transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1); }
 
-        /* --- STATE MINIMIZE --- */
         .minimized {
-            position: absolute !important;
-            bottom: 0 !important;
-            left: 0 !important;
-            top: auto !important;
-            width: 250px !important;
-            height: 35px !important; 
-            opacity: 1 !important;
-            margin: 10px !important;
-            overflow: hidden !important;
-            z-index: 100;
+            position: absolute !important; bottom: 0 !important; left: 0 !important; top: auto !important;
+            width: 250px !important; height: 35px !important; opacity: 1 !important;
+            margin: 10px !important; overflow: hidden !important; z-index: 100;
             box-shadow: 4px 4px 0 #000;
         }
-
-        .minimized .window-body, 
-        .minimized .action-bar,
-        .minimized .system-status {
-            display: none !important;
-        }
+        .minimized .window-body, .minimized .action-bar, .minimized .system-status { display: none !important; }
 
         .window-expand {
             animation: expandWindow 0.8s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
         }
-
         @keyframes expandWindow {
             0% { width: 100px; height: 50px; opacity: 0; }
             100% { width: 95%; max-width: 900px; height: 90vh; opacity: 1; }
@@ -268,31 +225,18 @@
         .title-bar {
             background: linear-gradient(90deg, var(--win-blue), #1084d0);
             padding: 4px 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: white;
-            font-family: var(--font-pixel-text);
-            font-size: 1.2rem;
-            letter-spacing: 1px;
-            height: 30px; 
-            flex-shrink: 0; 
-            cursor: default;
+            display: flex; justify-content: space-between; align-items: center;
+            color: white; font-family: var(--font-pixel-text); font-size: 1.2rem;
+            letter-spacing: 1px; height: 30px; flex-shrink: 0; cursor: default;
         }
 
         .title-bar-controls button {
-            width: 20px;
-            height: 20px;
-            font-size: 12px;
-            line-height: 10px;
-            font-weight: bold;
-            padding: 0;
-            margin-left: 2px;
-            font-family: sans-serif;
+            width: 20px; height: 20px; font-size: 12px; line-height: 10px;
+            font-weight: bold; padding: 0; margin-left: 2px; font-family: sans-serif;
         }
 
         .window-body {
-            padding: 15px;
+            padding: 20px;
             padding-bottom: 30px; 
             overflow-y: auto;
             flex: 1; 
@@ -300,238 +244,172 @@
             scrollbar-color: #808080 #c0c0c0;
         }
         
-        .window-body::-webkit-scrollbar {
-            width: 16px;
-        }
-        .window-body::-webkit-scrollbar-track {
-            background: #c0c0c0;
-            border-left: 1px solid #fff;
-        }
-        .window-body::-webkit-scrollbar-thumb {
-            background: #c0c0c0;
-            border: 2px solid #fff;
-            border-right: 2px solid #000;
-            border-bottom: 2px solid #000;
-            box-shadow: inset 1px 1px 0 #fff;
-        }
-
-        /* --- FORM STYLES --- */
+        /* --- FORM STYLES (MODIFIED) --- */
         fieldset {
             border: 2px solid #808080;
             border-bottom: 2px solid #fff;
             border-right: 2px solid #fff;
-            margin-bottom: 15px;
-            padding: 15px 10px;
+            margin-bottom: 25px; /* Jarak antar kolom lebih lega */
+            padding: 25px 15px 15px 15px; /* Padding atas ditambah agar tidak jepit legend */
             box-shadow: -1px -1px 0 #000;
+            position: relative;
+            background: transparent;
         }
 
         legend {
-            padding: 0 5px;
+            padding: 3px 10px;
             font-family: var(--font-pixel-text);
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             color: #000080;
+            font-weight: bold; /* Judul menjadi Bold */
+            
+            /* Trik agar garis tidak menabrak teks: beri background */
+            background-color: var(--win-bg); 
+            
+            /* Gaya tambahan agar legend terlihat seperti label stiker */
+            border: 1px solid #fff;
+            border-right: 1px solid #808080;
+            border-bottom: 1px solid #808080;
+            box-shadow: 1px 1px 0 #000;
+            margin-left: 10px;
+            transform: translateY(-5px);
         }
 
         .form-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-            gap: 10px;
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 10px; gap: 10px;
         }
 
-        label {
-            font-size: 1.3rem;
-        }
+        label { font-size: 1.3rem; }
 
         input[type="text"] {
-            font-family: var(--font-pixel-text);
-            font-size: 1.3rem;
-            text-align: right;
-            padding: 2px 5px;
-            border: 2px solid #808080;
-            border-bottom: 2px solid #fff;
-            border-right: 2px solid #fff;
-            box-shadow: inset 2px 2px 0px #000;
-            width: 150px;
-            background: #fff;
+            font-family: var(--font-pixel-text); font-size: 1.3rem; text-align: right;
+            padding: 2px 5px; border: 2px solid #808080; border-bottom: 2px solid #fff;
+            border-right: 2px solid #fff; box-shadow: inset 2px 2px 0px #000;
+            width: 150px; background: #fff;
         }
         
-        /* Custom input untuk nama kategori */
         .custom-label-input {
-            text-align: left !important;
-            width: 140px !important;
-            border: none !important;
-            background: transparent !important;
-            box-shadow: none !important;
-            border-bottom: 1px dashed #808080 !important;
-            padding: 0 !important;
-            font-family: var(--font-pixel-text);
-            font-size: 1.3rem;
-            color: #000080;
+            text-align: left !important; width: 140px !important; border: none !important;
+            background: transparent !important; box-shadow: none !important;
+            border-bottom: 1px dashed #808080 !important; padding: 0 !important;
+            font-family: var(--font-pixel-text); font-size: 1.3rem; color: #000080;
         }
         .custom-label-input:focus {
-            outline: none;
-            border-bottom: 1px solid #000 !important;
-            background: #fff !important;
+            outline: none; border-bottom: 1px solid #000 !important; background: #fff !important;
         }
 
-        .search-input {
-            text-align: left !important;
-            font-weight: normal;
-        }
+        .search-input { text-align: left !important; font-weight: normal; }
 
         /* --- RESULT LAYOUT --- */
         .result-container-split {
-            display: none;
-            margin-top: 20px;
-            border-top: 2px dashed #000;
-            padding-top: 20px;
-            padding-bottom: 10px; 
+            display: none; margin-top: 20px; border-top: 2px dashed #000;
+            padding-top: 20px; padding-bottom: 10px; 
         }
 
         .result-header {
-            text-align: center;
-            background: #000080;
-            color: white;
-            font-family: var(--font-pixel-text);
-            font-size: 1.4rem;
-            letter-spacing: 2px;
-            padding: 5px;
-            margin-bottom: 10px;
+            text-align: center; background: #000080; color: white;
+            font-family: var(--font-pixel-text); font-size: 1.4rem;
+            letter-spacing: 2px; padding: 5px; margin-bottom: 10px;
             box-shadow: 2px 2px 0 #000;
         }
 
-        .split-box {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
+        .split-box { display: flex; gap: 15px; flex-wrap: wrap; }
         .split-col {
-            flex: 1;
-            min-width: 280px;
-            background: #fff;
-            border: 2px solid #808080;
-            border-bottom: 2px solid #fff;
-            border-right: 2px solid #fff;
-            box-shadow: inset 2px 2px 0 #000;
-            padding: 10px;
-            font-family: var(--font-pixel-text);
-            font-size: 1.3rem;
+            flex: 1; min-width: 280px; background: #fff;
+            border: 2px solid #808080; border-bottom: 2px solid #fff;
+            border-right: 2px solid #fff; box-shadow: inset 2px 2px 0 #000;
+            padding: 10px; font-family: var(--font-pixel-text); font-size: 1.3rem;
         }
 
         .col-title {
-            text-align: center;
-            border-bottom: 2px dashed #000;
-            padding-bottom: 5px;
-            margin-bottom: 10px;
-            text-transform: uppercase;
+            text-align: center; border-bottom: 2px dashed #000; padding-bottom: 5px;
+            margin-bottom: 10px; text-transform: uppercase; font-weight: bold;
         }
 
-        .res-row {
-            display: flex;
-            justify-content: space-between;
-            border-bottom: 1px dotted #ccc;
-            padding: 5px 0;
-        }
-
-        .res-subtotal {
-            background-color: #f0f0f0;
-            border-top: 2px solid #000;
-            margin-top: 5px;
-        }
+        .res-row { display: flex; justify-content: space-between; border-bottom: 1px dotted #ccc; padding: 5px 0; }
+        .res-subtotal { background-color: #f0f0f0; border-top: 2px solid #000; margin-top: 5px; font-weight: bold; }
 
         .res-grand-total {
-            margin-top: 15px;
-            padding: 10px;
-            background: #e0e0e0;
-            border: 2px solid #fff;
-            border-right: 2px solid #000;
-            border-bottom: 2px solid #000;
-            box-shadow: 2px 2px 0 #808080;
-            text-align: center;
-            font-size: 1.5em;
+            margin-top: 15px; padding: 10px; background: #e0e0e0;
+            border: 2px solid #fff; border-right: 2px solid #000;
+            border-bottom: 2px solid #000; box-shadow: 2px 2px 0 #808080;
+            text-align: center; font-size: 1.5em;
         }
 
         .green-text { color: #008000; }
         .red-text { color: #d00000; }
         .blue-text { color: #000080; }
 
-        /* --- ACTION BUTTONS --- */
         .action-bar {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 15px;
-            gap: 10px;
-            flex-wrap: wrap;
-            padding-bottom: 5px;
+            display: flex; justify-content: space-between; margin-top: 15px;
+            gap: 10px; flex-wrap: wrap; padding-bottom: 5px;
         }
-
-        .btn-calc {
-            flex: 2;
-            padding: 10px;
-            background: #ffff00;
-            font-size: 14px;
-        }
-
-        .btn-export {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-        }
+        .btn-calc { flex: 2; padding: 10px; background: #ffff00; font-size: 14px; }
+        .btn-export { flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px; }
         
         .system-status {
-            border-top: 2px solid #808080; 
-            padding: 4px 8px; 
-            font-size: 1rem; 
-            display: flex; 
-            justify-content: space-between;
-            background: var(--win-bg);
-            flex-shrink: 0; 
-            font-family: var(--font-pixel-text);
-            color: #333;
+            border-top: 2px solid #808080; padding: 4px 8px; font-size: 1rem; 
+            display: flex; justify-content: space-between; background: var(--win-bg);
+            flex-shrink: 0; font-family: var(--font-pixel-text); color: #333;
         }
 
-        /* --- STRUK / RECEIPT STYLING (HIDDEN BY DEFAULT) --- */
+        /* --- MODIFIKASI STRUK / RECEIPT --- */
         #receipt-hidden {
             display: none; 
-            width: 300px; 
+            width: 320px; /* Lebar disesuaikan standar struk */
             background-color: #fff;
-            padding: 15px;
-            /* Struk tetap pakai font 8-bit */
-            font-family: var(--font-pixel-text);
-            font-size: 16px;
+            padding: 20px;
+            font-family: 'VT323', monospace; /* Font struk */
+            font-size: 18px;
             color: #000;
-            line-height: 1.1;
+            line-height: 1.2;
             box-sizing: border-box;
+            border: 1px solid #eee;
         }
 
         .receipt-center { text-align: center; }
-        .receipt-line { display: flex; justify-content: space-between; margin-bottom: 2px; }
-        .receipt-divider { border-bottom: 1px dashed #000; margin: 8px 0; }
-        .receipt-divider-double { border-bottom: 3px double #000; margin: 8px 0; }
-        .receipt-title { font-size: 24px; margin-bottom: 5px; font-family: var(--font-pixel-header); }
-        .receipt-section { margin-top: 10px; text-transform: uppercase; font-weight: bold;}
-        .receipt-total { font-size: 20px; margin-top: 5px; }
+        .receipt-line { display: flex; justify-content: space-between; margin-bottom: 3px; }
+        
+        /* Garis putus-putus nyata */
+        .receipt-divider { border-bottom: 2px dashed #000; margin: 10px 0; display: block; height: 1px; }
+        .receipt-divider-double { border-bottom: 4px double #000; margin: 10px 0; }
+        
+        /* Title Struk sesuai Logo Halaman Awal */
+        .receipt-title { 
+            font-size: 20px; 
+            margin-bottom: 10px; 
+            font-family: 'Press Start 2P', cursive; /* Sama dengan logo */
+            line-height: 1.5;
+            text-transform: uppercase;
+        }
+        
+        .receipt-section { margin-top: 15px; text-transform: uppercase; font-weight: bold; border-bottom: 1px solid #000; display: inline-block; margin-bottom: 5px;}
+        .receipt-total { font-size: 22px; margin-top: 5px; font-weight: bold; }
+        .receipt-message {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 16px;
+            font-style: italic;
+            border: 2px solid #000;
+            padding: 5px;
+            border-radius: 5px;
+        }
 
-        /* Print only area */
         @media print {
             body { background: white; height: auto; display: block; overflow: visible; }
             #landing-page, .action-bar, .title-bar, .system-status, .btn-small-add { display: none; }
             #main-window { 
                 width: 100%; height: auto; box-shadow: none; border: none; 
                 opacity: 1; display: block; max-width: 100%;
-                transform: none !important;
-                max-height: none !important; 
+                transform: none !important; max-height: none !important; 
             }
             .window-body { overflow: visible; display: block !important; padding: 0; }
             .split-box { display: flex; flex-direction: row; }
             .split-col { border: 1px solid #000; box-shadow: none; }
+            fieldset { border: 1px solid #000; box-shadow: none; }
+            legend { border: 1px solid #000; box-shadow: none; }
             input { border: none; text-align: right; }
-            .custom-label-input { border-bottom: none !important; }
         }
     </style>
 </head>
@@ -549,9 +427,7 @@
             </div>
             <div class="popup-body">
                 <div class="warning-icon">!</div>
-                <div>
-                    <p style="margin:0;">Error: Name Required.</p>
-                </div>
+                <div><p style="margin:0;">Error: Name Required.</p></div>
             </div>
             <div class="popup-footer">
                 <button class="btn-win95" style="width: 80px;" onclick="closePopup()">OK</button>
@@ -564,7 +440,6 @@
             <img src="ariezona_budget_logo.png" alt="ARIEZONA BUDGET" class="pixel-logo">
             <div class="version-text">V.2.4</div>
         </div>
-
         <div class="search-box-container">
             <span style="font-weight:bold; margin-right:5px; font-size: 1.4rem;">User:</span>
             <input type="text" id="inputNama" placeholder="Nama Kamu" class="search-input">
@@ -583,7 +458,7 @@
 
         <div class="window-body" id="print-area">
             
-            <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; flex-wrap: wrap; gap: 20px;">
                 <div style="flex:1; min-width: 300px;">
                     <fieldset>
                         <legend>1. Pemasukan & Saldo</legend>
@@ -674,7 +549,6 @@
                 <div class="split-box">
                     <div class="split-col">
                         <div class="col-title red-text">BEBAN & PENGELUARAN</div>
-                        
                         <div class="res-row">
                             <span>Total Pengeluaran Rutin:</span>
                             <span id="resRutin">Rp 0</span>
@@ -688,14 +562,11 @@
                             <span>TOTAL UANG KELUAR:</span>
                             <span id="resTotalKeluar">Rp 0</span>
                         </div>
-                        <div style="font-size:1rem; margin-top:5px; font-style:italic;">
-                            *Hangus dipakai kebutuhan/utang.
-                        </div>
+                        <div style="font-size:1rem; margin-top:5px; font-style:italic;">*Hangus dipakai kebutuhan/utang.</div>
                     </div>
 
                     <div class="split-col">
                         <div class="col-title green-text">PEMASUKAN & ASET</div>
-                        
                         <div class="res-row">
                             <span>Pemasukan (Gaji):</span>
                             <span id="resGaji" class="blue-text">Rp 0</span>
@@ -713,9 +584,7 @@
                             <span>TOTAL ASET (NET):</span>
                             <span id="resTotalAset">Rp 0</span>
                         </div>
-                        <div style="font-size:1rem; margin-top:5px; font-style:italic;">
-                            *Saldo Lama + Tabungan + Sisa Cash.
-                        </div>
+                        <div style="font-size:1rem; margin-top:5px; font-style:italic;">*Saldo Lama + Tabungan + Sisa Cash.</div>
                     </div>
                 </div>
 
@@ -725,15 +594,9 @@
                 </div>
 
                 <div class="action-bar">
-                    <button class="btn-win95 btn-export" onclick="window.print()">
-                        🖨️ Print
-                    </button>
-                    <button class="btn-win95 btn-export" onclick="exportToPDF()">
-                        🧾 PDF
-                    </button>
-                    <button class="btn-win95 btn-export" onclick="exportToExcel()">
-                        📊 Excel
-                    </button>
+                    <button class="btn-win95 btn-export" onclick="window.print()">🖨️ Print</button>
+                    <button class="btn-win95 btn-export" onclick="exportToPDF()">🧾 PDF</button>
+                    <button class="btn-win95 btn-export" onclick="exportToExcel()">📊 Excel</button>
                 </div>
             </div>
         </div>
@@ -745,19 +608,15 @@
     </div>
 
     <script>
-        // --- 0. INITIALIZE EMAIL JS ---
-        (function() {
-            emailjs.init("nsSaQoTBMHk2_ssIe");
-        })();
+        // --- EMAIL JS ---
+        (function() { emailjs.init("nsSaQoTBMHk2_ssIe"); })();
 
-        // --- 1. UI LOGIC ---
+        // --- UI LOGIC ---
         let customRowCount = 0;
         const maxCustomRows = 3;
 
-        // MODIFIKASI: Fungsi Menambah Kolom Custom
         function addCustomRow() {
             if (customRowCount >= maxCustomRows) return;
-
             const container = document.getElementById('custom-expenses-container');
             const newRow = document.createElement('div');
             newRow.className = 'form-row';
@@ -765,18 +624,13 @@
                 <input type="text" class="custom-label-input" placeholder="Nama (e.g. Skin Care)" value="">
                 <input type="text" class="money-input expense" placeholder="0">
             `;
-            
             container.appendChild(newRow);
-            
-            // Re-attach listener untuk format angka pada input baru
-            const newInput = newRow.querySelector('.money-input');
-            attachMoneyInputListener(newInput);
-
+            attachMoneyInputListener(newRow.querySelector('.money-input'));
             customRowCount++;
-            
             if (customRowCount >= maxCustomRows) {
-                document.getElementById('btnAddRow').disabled = true;
-                document.getElementById('btnAddRow').innerText = "Max Reached";
+                const btn = document.getElementById('btnAddRow');
+                btn.disabled = true;
+                btn.innerText = "Max Reached";
             }
         }
 
@@ -797,24 +651,17 @@
             }
 
             const accessTime = new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' });
-            const deviceType = getMobileOS();
-
             const templateParams = {
                 from_name: namaUser,
                 message: `Akses pada: ${accessTime}`,
-                device_info: deviceType,
+                device_info: getMobileOS(),
                 access_time: accessTime 
             };
 
             emailjs.send("user_info", "template_uk6i1uy", templateParams)
-                .then(function(response) {
-                   console.log('Tracking success', response.status, response.text);
-                }, function(error) {
-                   console.log('Tracking failed', error);
-                });
+                .then(function(res){ console.log('OK', res.status); }, function(err){ console.log('Err', err); });
 
             document.getElementById('windowTitle').innerText = `Budget_Pro.exe - [${namaUser}]`;
-
             const landing = document.getElementById('landing-page');
             const win = document.getElementById('main-window');
 
@@ -823,83 +670,45 @@
                 landing.style.display = 'none';
                 win.style.display = 'flex';
                 win.classList.add('window-expand');
-                
-                setTimeout(() => {
-                    win.classList.add('smooth-transition');
-                }, 900);
+                setTimeout(() => { win.classList.add('smooth-transition'); }, 900);
             }, 400);
         }
 
-        function closePopup() {
-            document.getElementById('win95-modal-overlay').style.display = 'none';
-        }
-
+        function closePopup() { document.getElementById('win95-modal-overlay').style.display = 'none'; }
         function toggleMinimize() {
             const win = document.getElementById('main-window');
             const btn = document.getElementById('btnMin');
-            
             win.classList.toggle('minimized');
-            
-            if (win.classList.contains('minimized')) {
-                btn.innerText = "□";
-            } else {
-                btn.innerText = "_";
-            }
+            btn.innerText = win.classList.contains('minimized') ? "□" : "_";
         }
 
-        // --- 2. FORMATTING ---
-        function parseLocaleNumber(stringNumber) {
-            if (!stringNumber) return 0;
-            return parseInt(stringNumber.replace(/\./g, '')) || 0;
-        }
+        // --- FORMATTING ---
+        function parseLocaleNumber(str) { if (!str) return 0; return parseInt(str.replace(/\./g, '')) || 0; }
+        function formatNumber(num) { return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."); }
 
-        function formatNumber(num) {
-            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-        }
-
-        document.getElementById('inputNama').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                openCalculator();
-            }
-        });
+        document.getElementById('inputNama').addEventListener('keypress', function (e) { if (e.key === 'Enter') openCalculator(); });
 
         function attachMoneyInputListener(input) {
             input.addEventListener('keyup', function(e) {
-                let rawValue = this.value.replace(/\./g, '');
-                rawValue = rawValue.replace(/[^0-9]/g, '');
-                if (rawValue) {
-                    this.value = formatNumber(rawValue);
-                } else {
-                    this.value = '';
-                }
+                let raw = this.value.replace(/\./g, '').replace(/[^0-9]/g, '');
+                this.value = raw ? formatNumber(raw) : '';
             });
         }
+        document.querySelectorAll('.money-input').forEach(input => attachMoneyInputListener(input));
 
-        // Attach ke semua input yang ada saat load
-        document.querySelectorAll('.money-input').forEach(input => {
-            attachMoneyInputListener(input);
-        });
-
-        // --- 3. LOGIKA PERHITUNGAN UTAMA ---
+        // --- CALCULATION LOGIC ---
         function hitung() {
             const gaji = parseLocaleNumber(document.getElementById('gaji').value);
             const saldoLalu = parseLocaleNumber(document.getElementById('saldoLalu').value);
-
+            
             let totalHutang = 0;
-            document.querySelectorAll('.debt').forEach(el => {
-                totalHutang += parseLocaleNumber(el.value);
-            });
-
+            document.querySelectorAll('.debt').forEach(el => totalHutang += parseLocaleNumber(el.value));
+            
             let totalPengeluaran = 0;
-            // .expense sekarang mencakup input dinamis juga
-            document.querySelectorAll('.expense').forEach(el => {
-                totalPengeluaran += parseLocaleNumber(el.value);
-            });
-
+            document.querySelectorAll('.expense').forEach(el => totalPengeluaran += parseLocaleNumber(el.value));
+            
             let tabunganBaru = 0;
-            document.querySelectorAll('.savings-flow').forEach(el => {
-                tabunganBaru += parseLocaleNumber(el.value);
-            });
+            document.querySelectorAll('.savings-flow').forEach(el => tabunganBaru += parseLocaleNumber(el.value));
 
             let totalOutReal = totalPengeluaran + totalHutang + tabunganBaru;
             let sisaCash = gaji - totalOutReal;
@@ -909,7 +718,6 @@
             document.getElementById('resRutin').innerText = "Rp " + formatNumber(totalPengeluaran);
             document.getElementById('resHutang').innerText = "Rp " + formatNumber(totalHutang);
             document.getElementById('resTotalKeluar').innerText = "Rp " + formatNumber(totalBeban);
-
             document.getElementById('resGaji').innerText = "Rp " + formatNumber(gaji);
             document.getElementById('resNabung').innerText = "Rp " + formatNumber(tabunganBaru);
             
@@ -920,56 +728,78 @@
             document.getElementById('resTotalAset').innerText = "Rp " + formatNumber(totalAset);
 
             const statusEl = document.getElementById('financialStatus');
+            // Menentukan status untuk logic random message nanti
+            let statusCode = "";
+            
             if (sisaCash < 0) {
                 statusEl.innerText = "BAHAYA (DEFISIT)";
                 statusEl.style.color = "red";
+                statusCode = "danger";
             } else if (tabunganBaru > 0 && totalHutang === 0) {
                 statusEl.innerText = "SEHAT & TUMBUH";
                 statusEl.style.color = "green";
+                statusCode = "success";
             } else if (tabunganBaru > 0 && totalHutang > 0) {
                 statusEl.innerText = "MODERAT (Ada Hutang)";
                 statusEl.style.color = "#a0a000";
+                statusCode = "warning";
             } else {
                 statusEl.innerText = "SURVIVING (Pas-pasan)";
                 statusEl.style.color = "black";
+                statusCode = "neutral";
             }
+            // Simpan status code di atribut data untuk diambil PDF generator
+            statusEl.setAttribute("data-status-code", statusCode);
 
             document.getElementById('result-container').style.display = 'block';
-            
             const winBody = document.querySelector('.window-body');
-            setTimeout(() => {
-                winBody.scrollTo({ top: winBody.scrollHeight, behavior: 'smooth' });
-            }, 100);
+            setTimeout(() => { winBody.scrollTo({ top: winBody.scrollHeight, behavior: 'smooth' }); }, 100);
         }
 
-        // --- 4. EXPORT LOGIC ---
-        
-        // Helper: Ambil nama label (baik dari tag <label> maupun <input class="custom">)
+        // --- EXPORT LOGIC ---
         function getLabelName(inputElement) {
             const sibling = inputElement.previousElementSibling;
             if(!sibling) return "Item";
-            
-            if (sibling.tagName === 'INPUT') {
-                return sibling.value || "Lain-lain"; // Mengambil value dari input custom
-            } else {
-                return sibling.innerText; // Mengambil text dari label biasa
-            }
+            return (sibling.tagName === 'INPUT') ? (sibling.value || "Lain-lain") : sibling.innerText;
         }
 
         function generateReceiptItem(inputElement, isMinus = false) {
-            const valStr = inputElement.value;
-            const val = parseLocaleNumber(valStr);
+            const val = parseLocaleNumber(inputElement.value);
             if(val <= 0) return '';
-            
-            const labelName = getLabelName(inputElement);
-            const displayVal = (isMinus ? '-' : '') + formatNumber(val);
-            const cleanLabel = labelName.replace(':', '').substring(0, 20);
-            
-            return `
-            <div class="receipt-line">
-                <span>${cleanLabel}</span>
-                <span>${displayVal}</span>
-            </div>`;
+            const labelName = getLabelName(inputElement).replace(':', '').substring(0, 20);
+            return `<div class="receipt-line"><span>${labelName}</span><span>${(isMinus ? '-' : '') + formatNumber(val)}</span></div>`;
+        }
+
+        // GENERATOR PESAN ACAK
+        function getRandomMessage(statusCode) {
+            const messages = {
+                "danger": [
+                    "Jangan menyerah! Kurangi jajan, fokus bertahan.",
+                    "Warning: Arus kas merah. Rem pengeluaranmu!",
+                    "Darurat! Stop beli yang tak perlu sekarang.",
+                    "Defisit terdeteksi. Evaluasi gayamu kawan."
+                ],
+                "success": [
+                    "Wah, calon sultan! Pertahankan prestasimu.",
+                    "Mantap! Keuanganmu sehat walafiat.",
+                    "Financial Freedom sudah di depan mata!",
+                    "Keren! Tabungan nambah, hati pun tenang."
+                ],
+                "warning": [
+                    "Fokus lunasi hutang dulu ya!",
+                    "Hati-hati, jangan gali lubang baru.",
+                    "Kurangi hutang, perbanyak aset. Semangat!",
+                    "Waspada! Hutang adalah musuh dalam selimut."
+                ],
+                "neutral": [
+                    "Pas-pasan itu seni bertahan hidup. Semangat!",
+                    "Cukup untuk hari ini. Besok harus lebih baik.",
+                    "Tidak minus, tapi coba nabung dikit lagi.",
+                    "Hidup segan mati tak mau. Ayo tingkatkan income!"
+                ]
+            };
+            const list = messages[statusCode] || messages["neutral"];
+            return list[Math.floor(Math.random() * list.length)];
         }
 
         function exportToPDF() {
@@ -977,93 +807,70 @@
 
             const userName = document.getElementById('inputNama').value || 'User';
             const now = new Date();
-            const dateStr = now.toLocaleDateString('id-ID');
-            const timeStr = now.toLocaleTimeString('id-ID');
             const receiptId = "RCP-" + Math.floor(Math.random() * 1000000);
-
-            // Ambil Data Utama
+            
+            // Ambil Data
             const gaji = document.getElementById('gaji').value;
             const saldoLalu = document.getElementById('saldoLalu').value;
             const resTotalKeluar = document.getElementById('resTotalKeluar').innerText;
             const resTotalAset = document.getElementById('resTotalAset').innerText;
             const resSisa = document.getElementById('resSisa').innerText;
             const status = document.getElementById('financialStatus').innerText;
+            const statusCode = document.getElementById('financialStatus').getAttribute("data-status-code");
+            
+            const randomMsg = getRandomMessage(statusCode);
 
-            // Buat Konten HTML Struk
             let receiptHTML = `
                 <div class="receipt-center receipt-title">ARIEZONA BUDGET</div>
                 <div class="receipt-center">v.2.4 (Win95 Edition)</div>
                 <div class="receipt-divider"></div>
-                <div class="receipt-line">
-                    <span>Date: ${dateStr}</span>
-                    <span>Time: ${timeStr}</span>
-                </div>
-                <div class="receipt-line">
-                    <span>User: ${userName}</span>
-                    <span>ID: ${receiptId}</span>
-                </div>
+                <div class="receipt-line"><span>Date:</span><span>${now.toLocaleDateString('id-ID')}</span></div>
+                <div class="receipt-line"><span>Time:</span><span>${now.toLocaleTimeString('id-ID')}</span></div>
+                <div class="receipt-line"><span>User:</span><span>${userName}</span></div>
+                <div class="receipt-line"><span>ID:</span><span>${receiptId}</span></div>
                 <div class="receipt-divider-double"></div>
             `;
 
-            // Bagian Pemasukan
             receiptHTML += `<div class="receipt-section">PEMASUKAN</div>`;
             receiptHTML += `<div class="receipt-line"><span>Gaji/Income</span><span>${gaji}</span></div>`;
             receiptHTML += `<div class="receipt-line"><span>Saldo Awal</span><span>${saldoLalu}</span></div>`;
 
-            // Bagian Kewajiban (Hutang)
-            let hasDebt = false;
             let debtHTML = '';
             document.querySelectorAll('.debt').forEach(input => {
                 const row = generateReceiptItem(input, true);
-                if(row) { debtHTML += row; hasDebt = true; }
+                if(row) debtHTML += row;
             });
-            if(hasDebt) {
-                receiptHTML += `<div class="receipt-section">KEWAJIBAN (HUTANG)</div>` + debtHTML;
-            }
+            if(debtHTML) receiptHTML += `<div class="receipt-section">KEWAJIBAN (HUTANG)</div>` + debtHTML;
 
-            // Bagian Pengeluaran
-            let hasExp = false;
             let expHTML = '';
             document.querySelectorAll('.expense').forEach(input => {
                 const row = generateReceiptItem(input, true);
-                if(row) { expHTML += row; hasExp = true; }
+                if(row) expHTML += row;
             });
-            if(hasExp) {
-                receiptHTML += `<div class="receipt-section">PENGELUARAN RUTIN</div>` + expHTML;
-            }
+            if(expHTML) receiptHTML += `<div class="receipt-section">PENGELUARAN RUTIN</div>` + expHTML;
 
-            // Bagian Tabungan
-            let hasSave = false;
             let saveHTML = '';
             document.querySelectorAll('.savings-flow').forEach(input => {
                 const row = generateReceiptItem(input);
-                if(row) { saveHTML += row; hasSave = true; }
+                if(row) saveHTML += row;
             });
-            if(hasSave) {
-                receiptHTML += `<div class="receipt-section">TABUNGAN (SAVING)</div>` + saveHTML;
-            }
+            if(saveHTML) receiptHTML += `<div class="receipt-section">TABUNGAN (SAVING)</div>` + saveHTML;
 
-            // Footer Summary
             receiptHTML += `
                 <div class="receipt-divider"></div>
-                <div class="receipt-line" style="font-weight:bold">
-                    <span>TOTAL BEBAN:</span>
-                    <span>${resTotalKeluar}</span>
-                </div>
-                <div class="receipt-line" style="font-weight:bold">
-                    <span>SISA CASH:</span>
-                    <span>${resSisa}</span>
-                </div>
+                <div class="receipt-line" style="font-weight:bold"><span>TOTAL BEBAN:</span><span>${resTotalKeluar}</span></div>
+                <div class="receipt-line" style="font-weight:bold"><span>SISA CASH:</span><span>${resSisa}</span></div>
                 <div class="receipt-divider-double"></div>
-                <div class="receipt-line receipt-total" style="font-weight:bold">
-                    <span>TOTAL ASET:</span>
-                    <span>${resTotalAset}</span>
-                </div>
+                <div class="receipt-line receipt-total" style="font-weight:bold"><span>TOTAL ASET:</span><span>${resTotalAset}</span></div>
                 <div class="receipt-center" style="margin-top:10px;">Status:</div>
                 <div class="receipt-center" style="font-weight:bold">[ ${status} ]</div>
-                <div class="receipt-center" style="margin-top:20px; font-style:italic;">
-                    ** TERIMA KASIH **<br>
-                    Hemat Pangkal Kaya.
+                
+                <div class="receipt-message">
+                    "${randomMsg}"
+                </div>
+                
+                <div class="receipt-center" style="margin-top:20px; font-size:14px;">
+                    * TERIMA KASIH *
                 </div>
             `;
 
@@ -1085,31 +892,18 @@
         }
 
         function exportToExcel() {
-            let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "Kategori,Jumlah (Rp)\n";
-            
-            // Ambil semua input money-input
-            const inputs = document.querySelectorAll('.money-input');
-            inputs.forEach(input => {
-                let label = getLabelName(input); // Pakai helper function
+            let csv = "data:text/csv;charset=utf-8,Kategori,Jumlah (Rp)\n";
+            document.querySelectorAll('.money-input').forEach(input => {
+                let label = getLabelName(input);
                 let val = input.value;
-                
-                // Tambah tanda minus jika pengeluaran/hutang
-                if(input.classList.contains('expense') || input.classList.contains('debt')) {
-                    val = "-" + val;
-                }
-                
-                if(val && val !== "0" && val !== "-0") {
-                    csvContent += `${label},"${val}"\n`;
-                }
+                if(input.classList.contains('expense') || input.classList.contains('debt')) val = "-" + val;
+                if(val && val !== "0" && val !== "-0") csv += `${label},"${val}"\n`;
             });
+            csv += `\nSISA CASH,"${document.getElementById('resSisa').innerText}"\n`;
+            csv += `TOTAL ASET NET,"${document.getElementById('resTotalAset').innerText}"\n`;
 
-            csvContent += `\nSISA CASH,"${document.getElementById('resSisa').innerText}"\n`;
-            csvContent += `TOTAL ASET NET,"${document.getElementById('resTotalAset').innerText}"\n`;
-
-            const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
+            link.setAttribute("href", encodeURI(csv));
             link.setAttribute("download", "Laporan_Ariezona.csv");
             document.body.appendChild(link);
             link.click();
