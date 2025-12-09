@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ARIEZONA Budget v2.3 - Win95</title>
+    <title>ARIEZONA Budget V.2.4 - Win95</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
@@ -17,11 +16,16 @@
             --win-gray-dark: #808080;
             --win-light: #ffffff;
             --desktop: #008080;
+            /* Font Variables */
+            --font-pixel-header: 'Press Start 2P', cursive;
+            --font-pixel-text: 'VT323', monospace;
         }
 
         body {
             background-color: var(--desktop);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* Mengubah font global jadi 8-bit */
+            font-family: var(--font-pixel-text); 
+            font-size: 1.3rem; /* Sedikit diperbesar agar font pixel terbaca jelas */
             margin: 0;
             height: 100vh;
             width: 100vw;
@@ -29,6 +33,7 @@
             justify-content: center;
             align-items: center;
             overflow: hidden;
+            -webkit-font-smoothing: none; /* Mematikan antialiasing agar tajam */
         }
 
         /* --- LANDING SEARCH PAGE --- */
@@ -36,38 +41,56 @@
             text-align: center;
             transition: all 0.5s ease;
             z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
         }
 
-        .pixel-font {
-            font-family: 'Press Start 2P', cursive;
+        /* Logo Image Style */
+        .pixel-logo {
+            max-width: 80%;
+            height: auto;
+            /* Bayangan hitam tajam (Hard Shadow) */
+            filter: drop-shadow(6px 6px 0px #000000); 
+            image-rendering: pixelated; /* Agar gambar tidak blur saat di resize */
+            margin-bottom: 5px;
+        }
+
+        .version-text {
+            font-family: var(--font-pixel-header);
             color: white;
-            text-shadow: 4px 4px #000;
+            font-size: 12px;
+            text-shadow: 2px 2px #000;
+            margin-top: 10px;
             margin-bottom: 20px;
-            font-size: 2rem;
-            line-height: 1.5;
+            letter-spacing: 2px;
         }
 
         .search-box-container {
             background: #c0c0c0;
             padding: 10px;
             border: 2px solid #fff;
-            box-shadow: 2px 2px 0 #000;
+            box-shadow: 4px 4px 0 #000;
             display: inline-block;
         }
 
         .search-input {
             width: 300px;
             padding: 5px;
-            font-family: 'VT323', monospace;
-            font-size: 1.2rem;
+            font-family: var(--font-pixel-text);
+            font-size: 1.4rem;
             background: #fff;
             color: #000;
             cursor: text;
+            border: 2px solid #808080;
+            border-bottom: 2px solid #fff;
+            border-right: 2px solid #fff;
+            box-shadow: inset 2px 2px 0px #000;
         }
         
         .search-input::placeholder {
             color: #808080;
-            font-style: italic;
         }
 
         .btn-win95 {
@@ -77,13 +100,13 @@
             border-bottom: 2px solid #000;
             border-right: 2px solid #000;
             padding: 5px 15px;
-            font-weight: bold;
             cursor: pointer;
             margin-left: 5px;
-            font-family: sans-serif;
-            font-size: 14px;
+            font-family: var(--font-pixel-header); /* Tombol pakai font header biar tebal */
+            font-size: 10px;
             color: black;
             outline: none;
+            box-shadow: 2px 2px 0px #000; /* Shadow tombol lebih tegas */
         }
 
         .btn-win95:active {
@@ -91,7 +114,23 @@
             border-left: 2px solid #000;
             border-bottom: 2px solid #fff;
             border-right: 2px solid #fff;
+            transform: translate(2px, 2px);
+            box-shadow: none;
         }
+
+        .btn-small-add {
+            font-family: var(--font-pixel-text);
+            font-size: 1rem;
+            padding: 2px 8px;
+            margin-top: 5px;
+            background: #008080;
+            color: white;
+            border: 2px solid #fff;
+            box-shadow: 2px 2px 0 #000;
+            cursor: pointer;
+        }
+        .btn-small-add:hover { background: #006060; }
+        .btn-small-add:disabled { background: #808080; cursor: not-allowed; }
 
         /* --- WINDOWS 95 POPUP MODAL --- */
         #win95-modal-overlay {
@@ -112,22 +151,23 @@
             border: 2px solid #fff;
             border-right: 2px solid #000;
             border-bottom: 2px solid #000;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+            box-shadow: 4px 4px 0px rgba(0,0,0,1);
             width: 300px;
             padding: 2px;
             display: flex;
             flex-direction: column;
+            font-family: var(--font-pixel-text);
         }
 
         .popup-header {
             background: var(--win-blue);
             color: white;
             padding: 2px 5px;
-            font-weight: bold;
-            font-size: 14px;
+            font-size: 1.2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            font-family: var(--font-pixel-text);
         }
 
         .popup-close-x {
@@ -136,12 +176,14 @@
             border: 1px solid #fff;
             border-right: 1px solid #000;
             border-bottom: 1px solid #000;
-            width: 16px;
-            height: 14px;
-            line-height: 12px;
+            width: 20px;
+            height: 18px;
+            line-height: 16px;
             text-align: center;
-            font-size: 10px;
+            font-size: 14px;
             cursor: pointer;
+            font-family: sans-serif;
+            font-weight: bold;
         }
 
         .popup-body {
@@ -159,9 +201,10 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 20px;
+            font-size: 24px;
             font-weight: bold;
             border: 2px solid #000;
+            font-family: serif;
         }
 
         .popup-footer {
@@ -178,7 +221,7 @@
             opacity: 0;
             background: var(--win-bg);
             border: 2px solid #fff;
-            box-shadow: 4px 4px 0 #000;
+            box-shadow: 6px 6px 0 #000;
             position: relative; 
             flex-direction: column;
             overflow: hidden;
@@ -204,7 +247,7 @@
             margin: 10px !important;
             overflow: hidden !important;
             z-index: 100;
-            box-shadow: 2px 2px 0 #000;
+            box-shadow: 4px 4px 0 #000;
         }
 
         .minimized .window-body, 
@@ -219,7 +262,7 @@
 
         @keyframes expandWindow {
             0% { width: 100px; height: 50px; opacity: 0; }
-            100% { width: 95%; max-width: 800px; height: 90vh; opacity: 1; }
+            100% { width: 95%; max-width: 900px; height: 90vh; opacity: 1; }
         }
 
         .title-bar {
@@ -229,9 +272,10 @@
             justify-content: space-between;
             align-items: center;
             color: white;
-            font-weight: bold;
-            font-size: 14px;
-            height: 25px; 
+            font-family: var(--font-pixel-text);
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+            height: 30px; 
             flex-shrink: 0; 
             cursor: default;
         }
@@ -244,6 +288,7 @@
             font-weight: bold;
             padding: 0;
             margin-left: 2px;
+            font-family: sans-serif;
         }
 
         .window-body {
@@ -256,14 +301,18 @@
         }
         
         .window-body::-webkit-scrollbar {
-            width: 12px;
+            width: 16px;
         }
         .window-body::-webkit-scrollbar-track {
             background: #c0c0c0;
+            border-left: 1px solid #fff;
         }
         .window-body::-webkit-scrollbar-thumb {
-            background: #808080;
-            border: 1px solid #fff;
+            background: #c0c0c0;
+            border: 2px solid #fff;
+            border-right: 2px solid #000;
+            border-bottom: 2px solid #000;
+            box-shadow: inset 1px 1px 0 #fff;
         }
 
         /* --- FORM STYLES --- */
@@ -272,12 +321,15 @@
             border-bottom: 2px solid #fff;
             border-right: 2px solid #fff;
             margin-bottom: 15px;
-            padding: 10px;
+            padding: 15px 10px;
+            box-shadow: -1px -1px 0 #000;
         }
 
         legend {
             padding: 0 5px;
-            font-weight: bold;
+            font-family: var(--font-pixel-text);
+            font-size: 1.3rem;
+            color: #000080;
         }
 
         .form-row {
@@ -285,24 +337,45 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 8px;
+            gap: 10px;
         }
 
         label {
-            font-size: 14px;
+            font-size: 1.3rem;
         }
 
         input[type="text"] {
-            font-family: 'Courier New', monospace;
+            font-family: var(--font-pixel-text);
+            font-size: 1.3rem;
             text-align: right;
-            padding: 3px;
+            padding: 2px 5px;
             border: 2px solid #808080;
-            border-bottom: 1px solid #fff;
-            border-right: 1px solid #fff;
-            box-shadow: inset 1px 1px 2px #000;
+            border-bottom: 2px solid #fff;
+            border-right: 2px solid #fff;
+            box-shadow: inset 2px 2px 0px #000;
             width: 150px;
-            font-weight: bold;
+            background: #fff;
         }
         
+        /* Custom input untuk nama kategori */
+        .custom-label-input {
+            text-align: left !important;
+            width: 140px !important;
+            border: none !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            border-bottom: 1px dashed #808080 !important;
+            padding: 0 !important;
+            font-family: var(--font-pixel-text);
+            font-size: 1.3rem;
+            color: #000080;
+        }
+        .custom-label-input:focus {
+            outline: none;
+            border-bottom: 1px solid #000 !important;
+            background: #fff !important;
+        }
+
         .search-input {
             text-align: left !important;
             font-weight: normal;
@@ -312,8 +385,8 @@
         .result-container-split {
             display: none;
             margin-top: 20px;
-            border-top: 2px solid #000;
-            padding-top: 10px;
+            border-top: 2px dashed #000;
+            padding-top: 20px;
             padding-bottom: 10px; 
         }
 
@@ -321,10 +394,12 @@
             text-align: center;
             background: #000080;
             color: white;
-            font-family: 'Courier New', monospace;
+            font-family: var(--font-pixel-text);
+            font-size: 1.4rem;
+            letter-spacing: 2px;
             padding: 5px;
             margin-bottom: 10px;
-            font-weight: bold;
+            box-shadow: 2px 2px 0 #000;
         }
 
         .split-box {
@@ -337,16 +412,18 @@
             flex: 1;
             min-width: 280px;
             background: #fff;
-            border: 2px inset #dcdcdc;
+            border: 2px solid #808080;
+            border-bottom: 2px solid #fff;
+            border-right: 2px solid #fff;
+            box-shadow: inset 2px 2px 0 #000;
             padding: 10px;
-            font-family: 'Courier New', Courier, monospace;
-            font-weight: bold;
-            font-size: 13px;
+            font-family: var(--font-pixel-text);
+            font-size: 1.3rem;
         }
 
         .col-title {
             text-align: center;
-            border-bottom: 2px solid #000;
+            border-bottom: 2px dashed #000;
             padding-bottom: 5px;
             margin-bottom: 10px;
             text-transform: uppercase;
@@ -361,17 +438,20 @@
 
         .res-subtotal {
             background-color: #f0f0f0;
-            border-top: 1px solid #000;
-            font-weight: 800;
+            border-top: 2px solid #000;
+            margin-top: 5px;
         }
 
         .res-grand-total {
-            margin-top: 10px;
+            margin-top: 15px;
             padding: 10px;
             background: #e0e0e0;
-            border: 2px solid #000;
+            border: 2px solid #fff;
+            border-right: 2px solid #000;
+            border-bottom: 2px solid #000;
+            box-shadow: 2px 2px 0 #808080;
             text-align: center;
-            font-size: 1.2em;
+            font-size: 1.5em;
         }
 
         .green-text { color: #008000; }
@@ -391,8 +471,8 @@
         .btn-calc {
             flex: 2;
             padding: 10px;
-            font-weight: bold;
             background: #ffff00;
+            font-size: 14px;
         }
 
         .btn-export {
@@ -406,41 +486,41 @@
         .system-status {
             border-top: 2px solid #808080; 
             padding: 4px 8px; 
-            font-size: 12px; 
+            font-size: 1rem; 
             display: flex; 
             justify-content: space-between;
             background: var(--win-bg);
             flex-shrink: 0; 
-            font-family: 'Segoe UI', sans-serif;
+            font-family: var(--font-pixel-text);
             color: #333;
         }
 
         /* --- STRUK / RECEIPT STYLING (HIDDEN BY DEFAULT) --- */
         #receipt-hidden {
-            display: none; /* Disembunyikan, hanya muncul saat render PDF */
-            width: 300px; /* Lebar standar struk thermal 80mm */
+            display: none; 
+            width: 300px; 
             background-color: #fff;
             padding: 15px;
-            font-family: 'Courier Prime', 'Courier New', monospace;
-            font-size: 11px;
+            /* Struk tetap pakai font 8-bit */
+            font-family: var(--font-pixel-text);
+            font-size: 16px;
             color: #000;
-            line-height: 1.3;
+            line-height: 1.1;
             box-sizing: border-box;
         }
 
         .receipt-center { text-align: center; }
-        .receipt-bold { font-weight: bold; }
         .receipt-line { display: flex; justify-content: space-between; margin-bottom: 2px; }
         .receipt-divider { border-bottom: 1px dashed #000; margin: 8px 0; }
         .receipt-divider-double { border-bottom: 3px double #000; margin: 8px 0; }
-        .receipt-title { font-size: 16px; margin-bottom: 5px; }
-        .receipt-section { margin-top: 10px; }
-        .receipt-total { font-size: 14px; margin-top: 5px; }
+        .receipt-title { font-size: 24px; margin-bottom: 5px; font-family: var(--font-pixel-header); }
+        .receipt-section { margin-top: 10px; text-transform: uppercase; font-weight: bold;}
+        .receipt-total { font-size: 20px; margin-top: 5px; }
 
         /* Print only area */
         @media print {
             body { background: white; height: auto; display: block; overflow: visible; }
-            #landing-page, .action-bar, .title-bar, .system-status { display: none; }
+            #landing-page, .action-bar, .title-bar, .system-status, .btn-small-add { display: none; }
             #main-window { 
                 width: 100%; height: auto; box-shadow: none; border: none; 
                 opacity: 1; display: block; max-width: 100%;
@@ -449,15 +529,16 @@
             }
             .window-body { overflow: visible; display: block !important; padding: 0; }
             .split-box { display: flex; flex-direction: row; }
-            .split-col { border: 1px solid #000; }
+            .split-col { border: 1px solid #000; box-shadow: none; }
+            input { border: none; text-align: right; }
+            .custom-label-input { border-bottom: none !important; }
         }
     </style>
 </head>
 <body>
 
     <div id="receipt-container" style="position: absolute; top: -9999px; left: -9999px;">
-        <div id="receipt-hidden">
-            </div>
+        <div id="receipt-hidden"></div>
     </div>
 
     <div id="win95-modal-overlay">
@@ -469,7 +550,7 @@
             <div class="popup-body">
                 <div class="warning-icon">!</div>
                 <div>
-                    <p style="margin:0; font-size:14px;">You must enter a name to continue.</p>
+                    <p style="margin:0;">Error: Name Required.</p>
                 </div>
             </div>
             <div class="popup-footer">
@@ -479,9 +560,13 @@
     </div>
 
     <div id="landing-page">
-        <h1 class="pixel-font">ARIEZONA<br>BUDGET v2.3</h1>
+        <div style="position: relative; display: flex; flex-direction: column; align-items: center;">
+            <img src="ariezona_budget_logo.png" alt="ARIEZONA BUDGET" class="pixel-logo">
+            <div class="version-text">V.2.4</div>
+        </div>
+
         <div class="search-box-container">
-            <span style="font-weight:bold; margin-right:5px;">User:</span>
+            <span style="font-weight:bold; margin-right:5px; font-size: 1.4rem;">User:</span>
             <input type="text" id="inputNama" placeholder="Nama Kamu" class="search-input">
             <button class="btn-win95" onclick="openCalculator()">START</button>
         </div>
@@ -530,7 +615,7 @@
                 </div>
 
                 <div style="flex:1; min-width: 300px;">
-                    <fieldset>
+                    <fieldset id="fieldset-pengeluaran">
                         <legend>3. Pengeluaran Rutin</legend>
                         <div class="form-row">
                             <label>Uang Kost/Sewa:</label>
@@ -552,9 +637,16 @@
                             <label>Transportasi:</label>
                             <input type="text" class="money-input expense" placeholder="0">
                         </div>
-                        <div class="form-row">
-                            <label>Lain-lain:</label>
-                            <input type="text" class="money-input expense" placeholder="0">
+                        
+                        <div id="custom-expenses-container">
+                             <div class="form-row">
+                                <input type="text" class="custom-label-input" value="Lain-lain" placeholder="Nama Pengeluaran">
+                                <input type="text" class="money-input expense" placeholder="0">
+                            </div>
+                        </div>
+
+                        <div style="text-align: right;">
+                            <button type="button" id="btnAddRow" class="btn-small-add" onclick="addCustomRow()">+ Tambah</button>
                         </div>
                     </fieldset>
                     
@@ -596,8 +688,8 @@
                             <span>TOTAL UANG KELUAR:</span>
                             <span id="resTotalKeluar">Rp 0</span>
                         </div>
-                        <div style="font-size:10px; margin-top:5px; font-style:italic;">
-                            *Uang ini hangus dipakai kebutuhan & bayar utang.
+                        <div style="font-size:1rem; margin-top:5px; font-style:italic;">
+                            *Hangus dipakai kebutuhan/utang.
                         </div>
                     </div>
 
@@ -621,14 +713,14 @@
                             <span>TOTAL ASET (NET):</span>
                             <span id="resTotalAset">Rp 0</span>
                         </div>
-                        <div style="font-size:10px; margin-top:5px; font-style:italic;">
-                            *Saldo Lama + Tabungan Baru + Sisa Cash.
+                        <div style="font-size:1rem; margin-top:5px; font-style:italic;">
+                            *Saldo Lama + Tabungan + Sisa Cash.
                         </div>
                     </div>
                 </div>
 
                 <div class="res-grand-total">
-                    <div>STATUS KEUANGAN:</div>
+                    <div style="font-size: 0.8em; margin-bottom: 5px;">STATUS KEUANGAN:</div>
                     <span id="financialStatus" style="font-weight:bold;">-</span>
                 </div>
 
@@ -648,7 +740,7 @@
         
         <div class="system-status">
             <span>Ariezona System Ready.</span>
-            <span style="font-weight:bold;">ARIEZONA Budget V2.2</span>
+            <span style="font-weight:bold;">ARIEZONA V.2.4</span>
         </div>
     </div>
 
@@ -659,6 +751,35 @@
         })();
 
         // --- 1. UI LOGIC ---
+        let customRowCount = 0;
+        const maxCustomRows = 3;
+
+        // MODIFIKASI: Fungsi Menambah Kolom Custom
+        function addCustomRow() {
+            if (customRowCount >= maxCustomRows) return;
+
+            const container = document.getElementById('custom-expenses-container');
+            const newRow = document.createElement('div');
+            newRow.className = 'form-row';
+            newRow.innerHTML = `
+                <input type="text" class="custom-label-input" placeholder="Nama (e.g. Skin Care)" value="">
+                <input type="text" class="money-input expense" placeholder="0">
+            `;
+            
+            container.appendChild(newRow);
+            
+            // Re-attach listener untuk format angka pada input baru
+            const newInput = newRow.querySelector('.money-input');
+            attachMoneyInputListener(newInput);
+
+            customRowCount++;
+            
+            if (customRowCount >= maxCustomRows) {
+                document.getElementById('btnAddRow').disabled = true;
+                document.getElementById('btnAddRow').innerText = "Max Reached";
+            }
+        }
+
         function getMobileOS() {
             const userAgent = navigator.userAgent || navigator.vendor || window.opera;
             if (/android/i.test(userAgent)) return "Android Phone";
@@ -742,7 +863,7 @@
             }
         });
 
-        document.querySelectorAll('.money-input').forEach(input => {
+        function attachMoneyInputListener(input) {
             input.addEventListener('keyup', function(e) {
                 let rawValue = this.value.replace(/\./g, '');
                 rawValue = rawValue.replace(/[^0-9]/g, '');
@@ -752,6 +873,11 @@
                     this.value = '';
                 }
             });
+        }
+
+        // Attach ke semua input yang ada saat load
+        document.querySelectorAll('.money-input').forEach(input => {
+            attachMoneyInputListener(input);
         });
 
         // --- 3. LOGIKA PERHITUNGAN UTAMA ---
@@ -765,6 +891,7 @@
             });
 
             let totalPengeluaran = 0;
+            // .expense sekarang mencakup input dinamis juga
             document.querySelectorAll('.expense').forEach(el => {
                 totalPengeluaran += parseLocaleNumber(el.value);
             });
@@ -817,14 +944,26 @@
 
         // --- 4. EXPORT LOGIC ---
         
-        // Helper: Generate baris item untuk struk
-        function generateReceiptItem(label, valStr, isMinus = false) {
+        // Helper: Ambil nama label (baik dari tag <label> maupun <input class="custom">)
+        function getLabelName(inputElement) {
+            const sibling = inputElement.previousElementSibling;
+            if(!sibling) return "Item";
+            
+            if (sibling.tagName === 'INPUT') {
+                return sibling.value || "Lain-lain"; // Mengambil value dari input custom
+            } else {
+                return sibling.innerText; // Mengambil text dari label biasa
+            }
+        }
+
+        function generateReceiptItem(inputElement, isMinus = false) {
+            const valStr = inputElement.value;
             const val = parseLocaleNumber(valStr);
             if(val <= 0) return '';
             
+            const labelName = getLabelName(inputElement);
             const displayVal = (isMinus ? '-' : '') + formatNumber(val);
-            // Label dipotong jika terlalu panjang
-            const cleanLabel = label.replace(':', '').substring(0, 18);
+            const cleanLabel = labelName.replace(':', '').substring(0, 20);
             
             return `
             <div class="receipt-line">
@@ -834,7 +973,6 @@
         }
 
         function exportToPDF() {
-            // Update dulu hitungan untuk memastikan data terbaru
             hitung(); 
 
             const userName = document.getElementById('inputNama').value || 'User';
@@ -853,105 +991,96 @@
 
             // Buat Konten HTML Struk
             let receiptHTML = `
-                <div class="receipt-center receipt-bold receipt-title">ARIEZONA BUDGET</div>
-                <div class="receipt-center">St. Graveyard, 666</div>
-                <div class="receipt-center">Telp: 08 666</div>
+                <div class="receipt-center receipt-title">ARIEZONA BUDGET</div>
+                <div class="receipt-center">v.2.4 (Win95 Edition)</div>
                 <div class="receipt-divider"></div>
                 <div class="receipt-line">
                     <span>Date: ${dateStr}</span>
                     <span>Time: ${timeStr}</span>
                 </div>
                 <div class="receipt-line">
-                    <span>Cashier: SYSTEM</span>
                     <span>User: ${userName}</span>
-                </div>
-                <div class="receipt-line">
-                    <span>Receipt ID:</span>
-                    <span>${receiptId}</span>
+                    <span>ID: ${receiptId}</span>
                 </div>
                 <div class="receipt-divider-double"></div>
             `;
 
             // Bagian Pemasukan
-            receiptHTML += `<div class="receipt-bold receipt-section">PEMASUKAN</div>`;
-            receiptHTML += generateReceiptItem('Gaji/Income', gaji);
-            receiptHTML += generateReceiptItem('Saldo Awal', saldoLalu);
+            receiptHTML += `<div class="receipt-section">PEMASUKAN</div>`;
+            receiptHTML += `<div class="receipt-line"><span>Gaji/Income</span><span>${gaji}</span></div>`;
+            receiptHTML += `<div class="receipt-line"><span>Saldo Awal</span><span>${saldoLalu}</span></div>`;
 
             // Bagian Kewajiban (Hutang)
             let hasDebt = false;
             let debtHTML = '';
             document.querySelectorAll('.debt').forEach(input => {
-                const row = generateReceiptItem(input.previousElementSibling.innerText, input.value, true);
+                const row = generateReceiptItem(input, true);
                 if(row) { debtHTML += row; hasDebt = true; }
             });
             if(hasDebt) {
-                receiptHTML += `<div class="receipt-bold receipt-section">KEWAJIBAN (HUTANG)</div>` + debtHTML;
+                receiptHTML += `<div class="receipt-section">KEWAJIBAN (HUTANG)</div>` + debtHTML;
             }
 
             // Bagian Pengeluaran
             let hasExp = false;
             let expHTML = '';
             document.querySelectorAll('.expense').forEach(input => {
-                const row = generateReceiptItem(input.previousElementSibling.innerText, input.value, true);
+                const row = generateReceiptItem(input, true);
                 if(row) { expHTML += row; hasExp = true; }
             });
             if(hasExp) {
-                receiptHTML += `<div class="receipt-bold receipt-section">PENGELUARAN RUTIN</div>` + expHTML;
+                receiptHTML += `<div class="receipt-section">PENGELUARAN RUTIN</div>` + expHTML;
             }
 
             // Bagian Tabungan
             let hasSave = false;
             let saveHTML = '';
             document.querySelectorAll('.savings-flow').forEach(input => {
-                const row = generateReceiptItem(input.previousElementSibling.innerText, input.value);
+                const row = generateReceiptItem(input);
                 if(row) { saveHTML += row; hasSave = true; }
             });
             if(hasSave) {
-                receiptHTML += `<div class="receipt-bold receipt-section">TABUNGAN (SAVING)</div>` + saveHTML;
+                receiptHTML += `<div class="receipt-section">TABUNGAN (SAVING)</div>` + saveHTML;
             }
 
             // Footer Summary
             receiptHTML += `
                 <div class="receipt-divider"></div>
-                <div class="receipt-line receipt-bold">
+                <div class="receipt-line" style="font-weight:bold">
                     <span>TOTAL BEBAN:</span>
                     <span>${resTotalKeluar}</span>
                 </div>
-                <div class="receipt-line receipt-bold">
+                <div class="receipt-line" style="font-weight:bold">
                     <span>SISA CASH:</span>
                     <span>${resSisa}</span>
                 </div>
                 <div class="receipt-divider-double"></div>
-                <div class="receipt-line receipt-bold receipt-total" style="font-size:16px">
+                <div class="receipt-line receipt-total" style="font-weight:bold">
                     <span>TOTAL ASET:</span>
                     <span>${resTotalAset}</span>
                 </div>
                 <div class="receipt-center" style="margin-top:10px;">Status:</div>
-                <div class="receipt-center receipt-bold">[ ${status} ]</div>
+                <div class="receipt-center" style="font-weight:bold">[ ${status} ]</div>
                 <div class="receipt-center" style="margin-top:20px; font-style:italic;">
                     ** TERIMA KASIH **<br>
-                    Simpan struk ini sebagai bukti<br>komitmen masa depan.
+                    Hemat Pangkal Kaya.
                 </div>
             `;
 
-            // Masukkan ke dalam div tersembunyi
             const receiptDiv = document.getElementById('receipt-hidden');
             receiptDiv.innerHTML = receiptHTML;
-            receiptDiv.style.display = 'block'; // Tampilkan sebentar untuk dirender
+            receiptDiv.style.display = 'block';
 
-            // Konfigurasi PDF agar ukuran kertas panjang seperti struk
             const opt = {
                 margin:       0,
                 filename:     `Struk_Ariezona_${userName}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2, useCORS: true },
-                // Atur unit ke mm, format custom lebar 80mm, tinggi menyesuaikan
                 jsPDF:        { unit: 'mm', format: [80, 297] } 
             };
 
-            // Generate
             html2pdf().set(opt).from(receiptDiv).save().then(() => {
-                receiptDiv.style.display = 'none'; // Sembunyikan lagi setelah selesai
+                receiptDiv.style.display = 'none';
             });
         }
 
@@ -959,16 +1088,18 @@
             let csvContent = "data:text/csv;charset=utf-8,";
             csvContent += "Kategori,Jumlah (Rp)\n";
             
-            const inputs = document.querySelectorAll('input[type="text"]');
+            // Ambil semua input money-input
+            const inputs = document.querySelectorAll('.money-input');
             inputs.forEach(input => {
-                if(input.classList.contains('search-input')) return;
-                
-                let label = input.previousElementSibling.innerText.replace(':', '');
+                let label = getLabelName(input); // Pakai helper function
                 let val = input.value;
+                
+                // Tambah tanda minus jika pengeluaran/hutang
                 if(input.classList.contains('expense') || input.classList.contains('debt')) {
                     val = "-" + val;
                 }
-                if(val && val !== "0") {
+                
+                if(val && val !== "0" && val !== "-0") {
                     csvContent += `${label},"${val}"\n`;
                 }
             });
