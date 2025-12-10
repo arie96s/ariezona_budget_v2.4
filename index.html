@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ARIEZONA Budget V.3 - Win95</title>
+    <title>ARIEZONA Budget V.3.0</title>
     
     <link rel="icon" type="image/png" href="New Project.png">
     
@@ -544,7 +544,7 @@
 
     <div id="main-window">
         <div class="title-bar">
-            <span id="windowTitle">ARIEZONA Budget_Pro.exe</span>
+            <span id="windowTitle">ARIEZONA Budget V.3.0.exe</span>
             <div class="title-bar-controls" style="display:flex; align-items:center;">
                 <button class="btn-win95 btn-calc-icon" onclick="toggleCalculator()" title="Calculator">🧮</button>
                 <button class="btn-win95" id="btnMin" onclick="toggleMinimize()">_</button>
@@ -822,7 +822,7 @@
             const templateParams = { from_name: namaUser, message: `User Login: ${namaUser}`, device_info: getMobileOS(), access_time: accessTime };
             emailjs.send("user_info", "template_uk6i1uy", templateParams).then(null, function(err){ console.log('Email Fail', err); });
 
-            document.getElementById('windowTitle').innerText = `Budget_Pro V.3 - [${namaUser}]`;
+            document.getElementById('windowTitle').innerText = `ARIEZONA_Budget V.3 - [${namaUser}]`;
             const landing = document.getElementById('landing-page');
             const win = document.getElementById('main-window');
             landing.style.opacity = '0';
@@ -984,7 +984,7 @@
                 <div class="print-footer">
                     "${getRandomMessage(document.getElementById('financialStatus').getAttribute("data-status-code"))}"
                     <br><br>
-                    * Laporan ini dicetak secara otomatis oleh sistem ArieZona Budget *
+                    * Laporan ini dicetak secara otomatis oleh sistem ARIEZONA Budget *
                 </div>
             `;
 
