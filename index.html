@@ -358,12 +358,16 @@
             margin: 0 auto; /* Posisi Center */
             background-color: #fff;
             padding: 10px;
+            /* FIX 1: Tambahkan padding bottom ekstra untuk safety margin saat PDF render */
+            padding-bottom: 50px; 
             font-family: 'VT323', monospace; 
-            font-size: 16px; /* Font agak dikecilkan dikit agar muat */
+            font-size: 16px; 
             color: #000;
             line-height: 1.2;
             box-sizing: border-box;
             border: 1px solid #eee; /* Border preview saja */
+            /* Ensure content doesn't bleed */
+            overflow: hidden; 
         }
 
         .receipt-center { text-align: center; }
@@ -375,23 +379,26 @@
         
         .receipt-section { margin-top: 15px; text-transform: uppercase; font-weight: bold; border-bottom: 1px solid #000; display: inline-block; margin-bottom: 5px;}
         .receipt-total { font-size: 20px; margin-top: 5px; font-weight: bold; }
+        
         .receipt-message {
             margin-top: 20px;
             text-align: center;
             font-size: 14px;
             font-style: italic;
             border: 2px solid #000;
-            padding: 5px;
+            padding: 8px; /* Sedikit dilonggarkan */
             border-radius: 5px;
+            /* FIX 2: Word wrap agar teks panjang tidak terpotong ke samping */
+            white-space: pre-wrap;
+            word-wrap: break-word;
         }
 
         /* LOGO STRUK STYLE */
         .receipt-logo-img {
-            width: 60%; /* Ukuran logo di struk */
+            width: 60%; 
             height: auto;
             margin: 0 auto 5px auto;
             display: block;
-            /* Filter Hitam Putih ala Thermal Printer */
             filter: grayscale(100%) contrast(150%);
         }
 
@@ -874,6 +881,7 @@
                 <div class="receipt-center" style="margin-top:20px; font-size:14px;">
                     * TERIMA KASIH *
                 </div>
+                <div style="height: 20px;"></div>
             `;
 
             const receiptDiv = document.getElementById('receipt-hidden');
@@ -882,7 +890,8 @@
 
             // Konfigurasi html2pdf agar pas di tengah kertas 80mm
             const opt = {
-                margin:       0, // Nol margin agar CSS yang mengatur posisi
+                // FIX 4: Tambah margin bawah pada PDF
+                margin:       [0, 0, 10, 0], 
                 filename:     `Struk_Ariezona_${userName}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
