@@ -237,7 +237,6 @@
             font-weight: bold; padding: 0; margin-left: 2px; font-family: sans-serif;
         }
         
-        /* New Calc Button Style in Title Bar */
         .btn-calc-icon {
             font-size: 14px !important; 
             width: 24px !important;
@@ -359,30 +358,32 @@
             flex-shrink: 0; font-family: var(--font-pixel-text); color: #333;
         }
 
-        /* --- CALCULATOR POPUP --- */
+        /* --- CALCULATOR POPUP (MODIFIED FOR DRAG) --- */
         #calc-popup {
             position: absolute;
             top: 20%;
-            right: 5%; /* Start slightly off */
+            left: 50%; /* Default centerish */
             width: 220px;
             background: var(--win-bg);
             border: 2px solid #fff;
             border-right: 2px solid #000;
             border-bottom: 2px solid #000;
-            box-shadow: 4px 4px 10px rgba(0,0,0,0.5);
+            box-shadow: 6px 6px 14px rgba(0,0,0,0.6);
             display: none;
             flex-direction: column;
             z-index: 200;
-            opacity: 0;
             transform: scale(0.9);
-            transition: all 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+            transition: transform 0.2s;
         }
 
         #calc-popup.show-calc {
             display: flex;
-            opacity: 1;
             transform: scale(1);
-            right: 15px; /* Slide in position */
+        }
+        
+        #calc-header {
+            cursor: move; /* Indikator bisa digeser */
+            user-select: none;
         }
 
         .calc-screen {
@@ -430,26 +431,26 @@
         .cal-red { color: darkred; font-weight: bold; }
         .cal-blue { color: darkblue; font-weight: bold; }
 
-        /* --- MODIFIKASI STRUK / RECEIPT (PERBAIKAN CSS PDF) --- */
+        /* --- MODIFIKASI STRUK / RECEIPT --- */
         #receipt-hidden {
-            display: none; 
-            /* Lebar disesuaikan dengan kertas 80mm (~75mm content untuk safety) */
-            width: 75mm; 
-            margin: 0 auto; /* Posisi Center */
+            width: 80mm; 
+            margin: 0;
             background-color: #fff;
-            padding: 10px;
+            padding: 5mm;
             font-family: 'VT323', monospace; 
-            font-size: 16px; /* Font agak dikecilkan dikit agar muat */
+            font-size: 16px; 
             color: #000;
             line-height: 1.2;
             box-sizing: border-box;
-            border: 1px solid #eee; /* Border preview saja */
+            border: none;
+            position: absolute; 
+            top: 0; 
+            left: -9999px; /* Offscreen agar tidak merusak layout */
         }
 
         .receipt-center { text-align: center; }
         .receipt-line { display: flex; justify-content: space-between; margin-bottom: 3px; }
         
-        /* Garis putus-putus nyata */
         .receipt-divider { border-bottom: 2px dashed #000; margin: 10px 0; display: block; height: 1px; }
         .receipt-divider-double { border-bottom: 4px double #000; margin: 10px 0; }
         
@@ -465,36 +466,41 @@
             border-radius: 5px;
         }
 
-        /* LOGO STRUK STYLE */
         .receipt-logo-img {
-            width: 60%; /* Ukuran logo di struk */
+            width: 60%; 
             height: auto;
             margin: 0 auto 5px auto;
             display: block;
-            /* Filter Hitam Putih ala Thermal Printer */
             filter: grayscale(100%) contrast(150%);
         }
 
+        /* --- PRINT MEDIA QUERY MODIFIED --- */
         @media print {
-            body { background: white; height: auto; display: block; overflow: visible; }
-            #landing-page, .action-bar, .title-bar, .system-status, .btn-small-add, #calc-popup { display: none !important; }
-            #main-window { 
-                width: 100%; height: auto; box-shadow: none; border: none; 
-                opacity: 1; display: block; max-width: 100%;
-                transform: none !important; max-height: none !important; 
+            body { 
+                background: white; 
+                height: auto; 
+                display: block; 
+                overflow: visible; 
             }
-            .window-body { overflow: visible; display: block !important; padding: 0; }
-            .split-box { display: flex; flex-direction: row; }
-            .split-col { border: 1px solid #000; box-shadow: none; }
-            fieldset { border: 1px solid #000; box-shadow: none; }
-            legend { border: 1px solid #000; box-shadow: none; }
-            input { border: none; text-align: right; }
+            /* Hide UI Elements */
+            #landing-page, #main-window, #calc-popup, #win95-modal-overlay { 
+                display: none !important; 
+            }
+
+            /* Show Receipt */
+            #receipt-container, #receipt-hidden { 
+                position: static !important; 
+                display: block !important; 
+                left: auto !important; 
+                top: auto !important;
+                margin: 0 auto;
+                width: 80mm; /* Lebar kertas struk */
+            }
         }
 
         @media screen and (max-width: 900px) {
-            #calc-popup.show-calc {
-                top: 50px;
-                right: 10px; /* Adjust for smaller screens */
+            #calc-popup {
+                left: 10% !important; /* Reset position on mobile refresh */
             }
         }
     </style>
@@ -502,10 +508,10 @@
 <body>
 
     <div id="calc-popup">
-        <div class="title-bar" style="height: 25px; font-size: 0.9rem; background: linear-gradient(90deg, #000080, #1084d0);">
-            <span>Calculator</span>
+        <div class="title-bar" id="calc-header" style="height: 25px; font-size: 0.9rem; background: linear-gradient(90deg, #000080, #1084d0);">
+            <span>Calculator (Drag Me)</span>
             <div class="title-bar-controls">
-                <button class="btn-win95" onclick="toggleCalculator()">X</button>
+                <button class="btn-win95" onclick="toggleCalculator()" onmousedown="event.stopPropagation()">X</button>
             </div>
         </div>
         <div class="calc-screen" id="calcDisplay">0</div>
@@ -535,7 +541,7 @@
         </div>
     </div>
 
-    <div id="receipt-container" style="position: absolute; top: -9999px; left: -9999px;">
+    <div id="receipt-container">
         <div id="receipt-hidden"></div>
     </div>
 
@@ -715,9 +721,9 @@
                 </div>
 
                 <div class="action-bar">
-                    <button class="btn-win95 btn-export" onclick="window.print()">🖨️ Print</button>
+                    <button class="btn-win95 btn-export" onclick="doPrintReceipt()">🖨️ Struk</button>
                     <button class="btn-win95 btn-export" onclick="exportToPDF()">🧾 PDF</button>
-                    <button class="btn-win95 btn-export" onclick="exportToExcel()">📊 Excel</button>
+                    <button class="btn-win95 btn-export" onclick="exportToExcelStruk()">📊 Excel</button>
                 </div>
             </div>
         </div>
@@ -732,14 +738,61 @@
         // --- EMAIL JS ---
         (function() { emailjs.init("nsSaQoTBMHk2_ssIe"); })();
 
-        // --- CALCULATOR LOGIC ---
+        // --- CALCULATOR LOGIC & DRAGGABLE ---
         let currentInput = "0";
         
+        // --- DRAG FUNCTIONALITY ---
+        dragElement(document.getElementById("calc-popup"));
+
+        function dragElement(elmnt) {
+            var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            if (document.getElementById("calc-header")) {
+                // if present, the header is where you move the DIV from:
+                document.getElementById("calc-header").onmousedown = dragMouseDown;
+            } else {
+                // otherwise, move the DIV from anywhere inside the DIV:
+                elmnt.onmousedown = dragMouseDown;
+            }
+
+            function dragMouseDown(e) {
+                e = e || window.event;
+                // prevent conflict with close button inside header
+                if(e.target.tagName === 'BUTTON') return;
+                
+                e.preventDefault();
+                // get the mouse cursor position at startup:
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                document.onmouseup = closeDragElement;
+                // call a function whenever the cursor moves:
+                document.onmousemove = elementDrag;
+            }
+
+            function elementDrag(e) {
+                e = e || window.event;
+                e.preventDefault();
+                // calculate the new cursor position:
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                // set the element's new position:
+                elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+                elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+            }
+
+            function closeDragElement() {
+                // stop moving when mouse button is released:
+                document.onmouseup = null;
+                document.onmousemove = null;
+            }
+        }
+
         function toggleCalculator() {
             const popup = document.getElementById('calc-popup');
             if (popup.classList.contains('show-calc')) {
                 popup.classList.remove('show-calc');
-                setTimeout(() => { popup.style.display = 'none'; }, 300);
+                setTimeout(() => { popup.style.display = 'none'; }, 200);
             } else {
                 popup.style.display = 'flex';
                 // Trigger reflow
@@ -748,45 +801,23 @@
             }
         }
 
-        function updateCalcDisplay() {
-            document.getElementById('calcDisplay').innerText = currentInput;
-        }
-
+        function updateCalcDisplay() { document.getElementById('calcDisplay').innerText = currentInput; }
         function appendCalc(char) {
-            if (currentInput === "0" && char !== '.') {
-                currentInput = char;
-            } else {
-                currentInput += char;
-            }
+            if (currentInput === "0" && char !== '.') currentInput = char;
+            else currentInput += char;
             updateCalcDisplay();
         }
-
-        function clearCalc() {
-            currentInput = "0";
-            updateCalcDisplay();
-        }
-
+        function clearCalc() { currentInput = "0"; updateCalcDisplay(); }
         function deleteCalcChar() {
-            if (currentInput.length > 1) {
-                currentInput = currentInput.slice(0, -1);
-            } else {
-                currentInput = "0";
-            }
+            if (currentInput.length > 1) currentInput = currentInput.slice(0, -1);
+            else currentInput = "0";
             updateCalcDisplay();
         }
-
         function calculateResult() {
             try {
-                // Safety check for simple math only
-                if(/[^0-9\+\-\*\/\.]/.test(currentInput)) {
-                    currentInput = "Error";
-                } else {
-                    // Using Function constructor as a safer alternative to eval for simple math
-                    currentInput = String(new Function('return ' + currentInput)());
-                }
-            } catch (e) {
-                currentInput = "Error";
-            }
+                if(/[^0-9\+\-\*\/\.]/.test(currentInput)) currentInput = "Error";
+                else currentInput = String(new Function('return ' + currentInput)());
+            } catch (e) { currentInput = "Error"; }
             updateCalcDisplay();
         }
 
@@ -907,7 +938,6 @@
             document.getElementById('resTotalAset').innerText = "Rp " + formatNumber(totalAset);
 
             const statusEl = document.getElementById('financialStatus');
-            // Menentukan status untuk logic random message nanti
             let statusCode = "";
             
             if (sisaCash < 0) {
@@ -927,7 +957,6 @@
                 statusEl.style.color = "black";
                 statusCode = "neutral";
             }
-            // Simpan status code di atribut data untuk diambil PDF generator
             statusEl.setAttribute("data-status-code", statusCode);
 
             document.getElementById('result-container').style.display = 'block';
@@ -935,7 +964,7 @@
             setTimeout(() => { winBody.scrollTo({ top: winBody.scrollHeight, behavior: 'smooth' }); }, 100);
         }
 
-        // --- EXPORT LOGIC ---
+        // --- HELPER FUNCTIONS ---
         function getLabelName(inputElement) {
             const sibling = inputElement.previousElementSibling;
             if(!sibling) return "Item";
@@ -949,46 +978,24 @@
             return `<div class="receipt-line"><span>${labelName}</span><span>${(isMinus ? '-' : '') + formatNumber(val)}</span></div>`;
         }
 
-        // GENERATOR PESAN ACAK
         function getRandomMessage(statusCode) {
             const messages = {
-                "danger": [
-                    "Jangan menyerah! Kurangi jajan, fokus bertahan.",
-                    "Warning: Arus kas merah. Rem pengeluaranmu!",
-                    "Darurat! Stop beli yang tak perlu sekarang.",
-                    "Defisit terdeteksi. Evaluasi gayamu kawan."
-                ],
-                "success": [
-                    "Wah, calon sultan! Pertahankan prestasimu.",
-                    "Mantap! Keuanganmu sehat walafiat.",
-                    "Financial Freedom sudah di depan mata!",
-                    "Keren! Tabungan nambah, hati pun tenang."
-                ],
-                "warning": [
-                    "Fokus lunasi hutang dulu ya!",
-                    "Hati-hati, jangan gali lubang baru.",
-                    "Kurangi hutang, perbanyak aset. Semangat!",
-                    "Waspada! Hutang adalah musuh dalam selimut."
-                ],
-                "neutral": [
-                    "Pas-pasan itu seni bertahan hidup. Semangat!",
-                    "Cukup untuk hari ini. Besok harus lebih baik.",
-                    "Tidak minus, tapi coba nabung dikit lagi.",
-                    "Hidup segan mati tak mau. Ayo tingkatkan income!"
-                ]
+                "danger": ["Jangan menyerah! Kurangi jajan.", "Warning: Arus kas merah!", "Darurat! Stop beli yang tak perlu.", "Defisit terdeteksi. Evaluasi!"],
+                "success": ["Wah, calon sultan!", "Mantap! Keuanganmu sehat.", "Financial Freedom sudah dekat!", "Keren! Tabungan nambah."],
+                "warning": ["Fokus lunasi hutang dulu.", "Hati-hati, jangan gali lubang.", "Kurangi hutang, perbanyak aset.", "Waspada hutang konsumtif."],
+                "neutral": ["Pas-pasan itu seni.", "Cukup untuk hari ini.", "Tidak minus, tapi coba nabung.", "Ayo tingkatkan income!"]
             };
             const list = messages[statusCode] || messages["neutral"];
             return list[Math.floor(Math.random() * list.length)];
         }
 
-        function exportToPDF() {
-            hitung(); 
-
+        // --- CORE: GENERATE RECEIPT HTML ---
+        function renderReceiptToDOM() {
+            hitung();
             const userName = document.getElementById('inputNama').value || 'User';
             const now = new Date();
             const receiptId = "RCP-" + Math.floor(Math.random() * 1000000);
             
-            // Ambil Data
             const gaji = document.getElementById('gaji').value;
             const saldoLalu = document.getElementById('saldoLalu').value;
             const resTotalKeluar = document.getElementById('resTotalKeluar').innerText;
@@ -996,13 +1003,11 @@
             const resSisa = document.getElementById('resSisa').innerText;
             const status = document.getElementById('financialStatus').innerText;
             const statusCode = document.getElementById('financialStatus').getAttribute("data-status-code");
-            
             const randomMsg = getRandomMessage(statusCode);
 
-            // Perbaikan: Ganti Judul Text dengan Gambar Logo
             let receiptHTML = `
                 <div class="receipt-center">
-                    <img src="ariezona_budget_logo_black.png" alt="Logo" class="receipt-logo-img">
+                    <img src="ariezona_budget_logo_black.png" alt="ARIEZONA" class="receipt-logo-img">
                 </div>
                 <div class="receipt-center">v.2.5 (Win95 Edition)</div>
                 <div class="receipt-divider"></div>
@@ -1046,48 +1051,109 @@
                 <div class="receipt-line receipt-total" style="font-weight:bold"><span>TOTAL ASET:</span><span>${resTotalAset}</span></div>
                 <div class="receipt-center" style="margin-top:10px;">Status:</div>
                 <div class="receipt-center" style="font-weight:bold">[ ${status} ]</div>
-                
-                <div class="receipt-message">
-                    "${randomMsg}"
-                </div>
-                
-                <div class="receipt-center" style="margin-top:20px; font-size:14px;">
-                    * TERIMA KASIH *
-                </div>
+                <div class="receipt-message">"${randomMsg}"</div>
+                <div class="receipt-center" style="margin-top:20px; font-size:14px;">* TERIMA KASIH *</div>
             `;
 
-            const receiptDiv = document.getElementById('receipt-hidden');
-            receiptDiv.innerHTML = receiptHTML;
-            receiptDiv.style.display = 'block';
+            document.getElementById('receipt-hidden').innerHTML = receiptHTML;
+        }
 
-            // Konfigurasi html2pdf agar pas di tengah kertas 80mm
+        // --- EXPORT PDF (FIXED CUT-OFF) ---
+        function exportToPDF() {
+            renderReceiptToDOM();
+            const element = document.getElementById('receipt-hidden');
+            const userName = document.getElementById('inputNama').value || 'User';
+
+            // Gunakan pengaturan ini untuk menghindari potong
             const opt = {
-                margin:       0, // Nol margin agar CSS yang mengatur posisi
+                margin:       1,
                 filename:     `Struk_Ariezona_${userName}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
-                jsPDF:        { unit: 'mm', format: [80, 297] } // Format thermal roll
+                jsPDF:        { unit: 'mm', format: [88, 250] } // Format custom panjang
             };
 
-            html2pdf().set(opt).from(receiptDiv).save().then(() => {
-                receiptDiv.style.display = 'none';
+            // Trik: Clone element ke body agar visible saat render
+            const clone = element.cloneNode(true);
+            clone.style.left = '0px';
+            clone.style.top = '0px';
+            clone.style.position = 'absolute';
+            clone.style.zIndex = '-999'; 
+            document.body.appendChild(clone);
+
+            html2pdf().set(opt).from(clone).save().then(() => {
+                document.body.removeChild(clone);
             });
         }
 
-        function exportToExcel() {
-            let csv = "data:text/csv;charset=utf-8,Kategori,Jumlah (Rp)\n";
-            document.querySelectorAll('.money-input').forEach(input => {
-                let label = getLabelName(input);
-                let val = input.value;
-                if(input.classList.contains('expense') || input.classList.contains('debt')) val = "-" + val;
-                if(val && val !== "0" && val !== "-0") csv += `${label},"${val}"\n`;
-            });
-            csv += `\nSISA CASH,"${document.getElementById('resSisa').innerText}"\n`;
-            csv += `TOTAL ASET NET,"${document.getElementById('resTotalAset').innerText}"\n`;
+        // --- PRINT (NATIVE) MENJADI STRUK ---
+        function doPrintReceipt() {
+            renderReceiptToDOM();
+            setTimeout(() => {
+                window.print();
+            }, 500);
+        }
+
+        // --- EXPORT EXCEL (FORMAT STRUK/TABEL) ---
+        function exportToExcelStruk() {
+            // Render dulu agar struktur data siap
+            renderReceiptToDOM();
+            const receiptDiv = document.getElementById('receipt-hidden');
+            
+            // Konversi HTML Struk ke format Table sederhana untuk Excel
+            // Kita replace div struktur menjadi table row untuk di-parsing excel
+            let excelHTML = `
+                <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+                <head></head>
+                <body>
+                    <table border="1" style="font-family: monospace;">
+                        <tr><td colspan="2" style="text-align:center; font-weight:bold; font-size:16px;">ARIEZONA BUDGET V.2.5</td></tr>
+                        <tr><td colspan="2" style="text-align:center;">Laporan Keuangan</td></tr>
+                        <tr><td></td><td></td></tr>
+            `;
+
+            // Parsing manual data dari input
+            const addRow = (label, val, bold=false, color="black") => {
+                if(val && val !== '0' && val !== 'Rp 0') {
+                    const style = bold ? 'font-weight:bold;' : '';
+                    excelHTML += `<tr><td style="${style} color:${color};">${label}</td><td style="${style} text-align:right; color:${color};">${val}</td></tr>`;
+                }
+            };
+
+            addRow("Tanggal", new Date().toLocaleDateString('id-ID'));
+            addRow("User", document.getElementById('inputNama').value);
+            excelHTML += `<tr><td colspan="2" style="background:#eee; font-weight:bold;">PEMASUKAN</td></tr>`;
+            addRow("Gaji", document.getElementById('gaji').value);
+            addRow("Saldo Awal", document.getElementById('saldoLalu').value);
+
+            // Hutang
+            let hasDebt = false;
+            document.querySelectorAll('.debt').forEach(el => { if(parseLocaleNumber(el.value)>0) hasDebt=true; });
+            if(hasDebt) {
+                excelHTML += `<tr><td colspan="2" style="background:#eee; font-weight:bold;">KEWAJIBAN</td></tr>`;
+                document.querySelectorAll('.debt').forEach(el => addRow(getLabelName(el), "-" + el.value, false, 'red'));
+            }
+
+            // Pengeluaran
+            excelHTML += `<tr><td colspan="2" style="background:#eee; font-weight:bold;">PENGELUARAN</td></tr>`;
+            document.querySelectorAll('.expense').forEach(el => addRow(getLabelName(el), "-" + el.value, false, 'red'));
+
+            // Tabungan
+            excelHTML += `<tr><td colspan="2" style="background:#eee; font-weight:bold;">TABUNGAN</td></tr>`;
+            document.querySelectorAll('.savings-flow').forEach(el => addRow(getLabelName(el), el.value, false, 'green'));
+
+            // Total
+            excelHTML += `<tr><td></td><td></td></tr>`;
+            addRow("TOTAL BEBAN", document.getElementById('resTotalKeluar').innerText, true, 'red');
+            addRow("SISA CASH", document.getElementById('resSisa').innerText, true);
+            addRow("TOTAL ASET NET", document.getElementById('resTotalAset').innerText, true, 'blue');
+            addRow("STATUS", document.getElementById('financialStatus').innerText, true);
+
+            excelHTML += `</table></body></html>`;
 
             const link = document.createElement("a");
-            link.setAttribute("href", encodeURI(csv));
-            link.setAttribute("download", "Laporan_Ariezona.csv");
+            link.href = 'data:application/vnd.ms-excel,' + encodeURIComponent(excelHTML);
+            link.download = `Laporan_Struk_${document.getElementById('inputNama').value}.xls`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
