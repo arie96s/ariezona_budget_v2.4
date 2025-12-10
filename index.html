@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ARIEZONA Budget V.3 - Win95</title>
+    <title>ARIEZONA Budget V.3</title>
+    
+    <link rel="icon" type="image/png" href="New Project.png">
+    
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -33,7 +36,7 @@
             overflow: hidden;
             -webkit-font-smoothing: none;
             position: relative;
-            touch-action: none; /* Mencegah scroll overscroll di mobile */
+            touch-action: none;
         }
 
         /* --- LANDING SEARCH PAGE --- */
@@ -250,7 +253,6 @@
             flex: 1; 
             scrollbar-width: thin;
             scrollbar-color: #808080 #c0c0c0;
-            /* Allow touch scroll inside window */
             touch-action: pan-y;
         }
         
@@ -360,11 +362,11 @@
             flex-shrink: 0; font-family: var(--font-pixel-text); color: #333;
         }
 
-        /* --- CALCULATOR POPUP (Draggable & Improved) --- */
+        /* --- CALCULATOR POPUP --- */
         #calc-popup {
-            position: fixed; /* Fixed agar bisa drag relative ke viewport */
+            position: fixed; 
             top: 20%;
-            right: 5%; /* Initial Position */
+            right: 5%; 
             width: 240px;
             background: var(--win-bg);
             border: 2px solid #fff;
@@ -377,7 +379,6 @@
             opacity: 0;
             transform: scale(0.9);
             transition: opacity 0.2s, transform 0.2s; 
-            /* Remove 'right' transition to allow smooth dragging */
         }
 
         #calc-popup.show-calc {
@@ -386,11 +387,10 @@
             transform: scale(1);
         }
 
-        /* Header khusus untuk drag handle */
         #calc-header {
-            cursor: move; /* Tanda bisa digerakkan */
+            cursor: move; 
             user-select: none;
-            touch-action: none; /* Penting untuk drag di mobile */
+            touch-action: none;
         }
 
         .calc-screen {
@@ -439,13 +439,12 @@
         .cal-red { color: darkred; font-weight: bold; }
         .cal-blue { color: darkblue; font-weight: bold; }
 
-        /* --- STRUK / RECEIPT (Used for PDF & Print) --- */
+        /* --- STRUK / RECEIPT --- */
         #receipt-hidden {
-            /* Jangan gunakan display:none agar bisa dirender html2pdf, tapi lempar keluar layar */
             position: absolute;
             left: -9999px;
             top: 0;
-            width: 78mm; /* Sesuai lebar kertas thermal standar */
+            width: 78mm;
             background-color: #fff;
             padding: 2mm;
             font-family: 'VT323', monospace; 
@@ -479,7 +478,7 @@
             filter: grayscale(100%) contrast(150%);
         }
 
-        /* --- PRINT MEDIA QUERY (MODIFIED for RECEIPT ONLY) --- */
+        /* --- PRINT MEDIA QUERY --- */
         @media print {
             body { 
                 background: white; 
@@ -487,20 +486,17 @@
                 display: block; 
                 overflow: visible; 
             }
-            /* Sembunyikan SEMUA elemen UI aplikasi */
             #landing-page, #win95-modal-overlay, #main-window, #calc-popup { 
                 display: none !important; 
             }
-
-            /* Tampilkan HANYA Struk */
             #receipt-hidden {
                 display: block !important;
                 position: relative !important;
                 left: auto !important;
                 top: auto !important;
                 margin: 0 auto;
-                width: 100%; /* Full width kertas */
-                max-width: 80mm; /* Batas lebar thermal */
+                width: 100%;
+                max-width: 80mm;
                 border: none;
             }
         }
@@ -735,85 +731,62 @@
 
     <script>
         // --- EMAIL JS INIT ---
-        // Pastikan Anda sudah membuat Template di dashboard EmailJS
-        // Dengan variabel: {{from_name}}, {{device_info}}, {{access_time}}
         (function() { emailjs.init("nsSaQoTBMHk2_ssIe"); })();
 
         // --- DRAGGABLE CALCULATOR LOGIC ---
         const calcPopup = document.getElementById("calc-popup");
         const calcHeader = document.getElementById("calc-header");
 
-        // Fungsi untuk Drag (Mobile & Desktop)
         function dragElement(elmnt) {
             let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
             const header = document.getElementById(elmnt.id + "-header") || elmnt;
             
             header.onmousedown = dragMouseDown;
-            header.ontouchstart = dragMouseDown; // Support Mobile Touch
+            header.ontouchstart = dragMouseDown;
 
             function dragMouseDown(e) {
                 e = e || window.event;
-                // get the mouse cursor position at startup:
-                // Handle touch vs mouse
                 const clientX = e.touches ? e.touches[0].clientX : e.clientX;
                 const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
                 pos3 = clientX;
                 pos4 = clientY;
-                
                 document.onmouseup = closeDragElement;
                 document.onmousemove = elementDrag;
-                
-                // Touch events
                 document.ontouchend = closeDragElement;
                 document.ontouchmove = elementDrag;
             }
 
             function elementDrag(e) {
                 e = e || window.event;
-                // prevent default for touch to stop scrolling
-                if (e.type === 'touchmove') { /* e.preventDefault(); */ }
-
+                if (e.type === 'touchmove') {} 
                 const clientX = e.touches ? e.touches[0].clientX : e.clientX;
                 const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
-                // calculate the new cursor position:
                 pos1 = pos3 - clientX;
                 pos2 = pos4 - clientY;
                 pos3 = clientX;
                 pos4 = clientY;
-
-                // set the element's new position:
                 elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
                 elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
-                
-                // Reset 'right' to auto so left positioning works
                 elmnt.style.right = 'auto'; 
             }
 
             function closeDragElement() {
-                // stop moving when mouse button is released:
                 document.onmouseup = null;
                 document.onmousemove = null;
                 document.ontouchend = null;
                 document.ontouchmove = null;
             }
         }
-        
-        // Init Drag
         dragElement(document.getElementById("calc-popup"));
-
 
         // --- CALCULATOR LOGIC ---
         let currentInput = "0";
-        
         function toggleCalculator() {
             if (calcPopup.classList.contains('show-calc')) {
                 calcPopup.classList.remove('show-calc');
                 setTimeout(() => { calcPopup.style.display = 'none'; }, 200);
             } else {
                 calcPopup.style.display = 'flex';
-                // Reset position if off screen (safety)
                 if(calcPopup.offsetLeft < 0 || calcPopup.offsetTop < 0) {
                    calcPopup.style.top = '20%';
                    calcPopup.style.left = 'auto';
@@ -823,7 +796,6 @@
                 calcPopup.classList.add('show-calc');
             }
         }
-
         function updateCalcDisplay() { document.getElementById('calcDisplay').innerText = currentInput; }
         function appendCalc(char) {
             if (currentInput === "0" && char !== '.') currentInput = char;
@@ -878,29 +850,23 @@
         function openApp() {
             const inputNama = document.getElementById('inputNama');
             let namaUser = inputNama.value.trim();
-
             if (namaUser === "") {
                 document.getElementById('win95-modal-overlay').style.display = 'flex';
                 return;
             }
-
             const accessTime = new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' });
-            
-            // --- KIRIM EMAIL ---
             const templateParams = {
-                from_name: namaUser,            // Nama User
+                from_name: namaUser,
                 message: `User Login: ${namaUser}`,
-                device_info: getMobileOS(),     // Jenis Device
-                access_time: accessTime         // Jam Akses
+                device_info: getMobileOS(),
+                access_time: accessTime
             };
-
             emailjs.send("user_info", "template_uk6i1uy", templateParams)
                 .then(function(res){ console.log('Email Sent', res.status); }, function(err){ console.log('Email Fail', err); });
 
             document.getElementById('windowTitle').innerText = `Budget_Pro V.3 - [${namaUser}]`;
             const landing = document.getElementById('landing-page');
             const win = document.getElementById('main-window');
-
             landing.style.opacity = '0';
             setTimeout(() => {
                 landing.style.display = 'none';
@@ -918,7 +884,6 @@
             btn.innerText = win.classList.contains('minimized') ? "□" : "_";
         }
 
-        // --- FORMATTING ---
         function parseLocaleNumber(str) { if (!str) return 0; return parseInt(str.replace(/\./g, '')) || 0; }
         function formatNumber(num) { return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."); }
 
@@ -932,7 +897,6 @@
         }
         document.querySelectorAll('.money-input').forEach(input => attachMoneyInputListener(input));
 
-        // --- CALCULATION LOGIC ---
         function hitung() {
             const gaji = parseLocaleNumber(document.getElementById('gaji').value);
             const saldoLalu = parseLocaleNumber(document.getElementById('saldoLalu').value);
@@ -965,7 +929,6 @@
 
             const statusEl = document.getElementById('financialStatus');
             let statusCode = "";
-            
             if (sisaCash < 0) {
                 statusEl.innerText = "BAHAYA (DEFISIT)";
                 statusEl.style.color = "red";
@@ -990,7 +953,7 @@
             setTimeout(() => { winBody.scrollTo({ top: winBody.scrollHeight, behavior: 'smooth' }); }, 100);
         }
 
-        // --- RECEIPT GENERATION ---
+        // --- RECEIPT GENERATION HELPERS ---
         function getLabelName(inputElement) {
             const sibling = inputElement.previousElementSibling;
             if(!sibling) return "Item";
@@ -1015,15 +978,19 @@
             return list[Math.floor(Math.random() * list.length)];
         }
 
-        // RENDER STRUK HTML (Digunakan untuk Print & PDF)
+        // --- RENDER RECEIPT FUNCTION ---
         function renderReceiptHTML() {
             hitung();
             const userName = document.getElementById('inputNama').value || 'User';
             const now = new Date();
-            const receiptId = "RCP-" + Math.floor(Math.random() * 1000000);
+            // Simpan ID agar konsisten jika dipanggil berulang
+            if (!window.currentReceiptId) {
+                window.currentReceiptId = "RCP-" + Math.floor(Math.random() * 1000000);
+            }
+            const receiptId = window.currentReceiptId;
             
-            const gaji = document.getElementById('gaji').value;
-            const saldoLalu = document.getElementById('saldoLalu').value;
+            const gaji = document.getElementById('gaji').value || "0";
+            const saldoLalu = document.getElementById('saldoLalu').value || "0";
             const resTotalKeluar = document.getElementById('resTotalKeluar').innerText;
             const resTotalAset = document.getElementById('resTotalAset').innerText;
             const resSisa = document.getElementById('resSisa').innerText;
@@ -1090,88 +1057,123 @@
             setTimeout(() => { window.print(); }, 500);
         }
 
+        // --- FIXED PDF EXPORT FUNCTION ---
+        // Memperbaiki masalah struk kosong dengan teknik cloning ke layer visible sementara
         function exportToPDF() {
             renderReceiptHTML(); 
-            const receiptDiv = document.getElementById('receipt-hidden');
+            const source = document.getElementById('receipt-hidden'); // Perbaikan ID dari receipt-show ke receipt-hidden
             const userName = document.getElementById('inputNama').value || 'User';
+
+            // 1. Clone element agar bisa dimodifikasi style-nya tanpa merusak layout asli
+            const element = source.cloneNode(true);
             
-            // Hitung tinggi konten agar PDF tidak terpotong
-            // 0.264583 adalah konversi px ke mm, ditambah buffer 20mm
-            const contentHeightMM = (receiptDiv.scrollHeight * 0.264583) + 20;
+            // 2. Buat element terlihat di layar (overlay) agar html2canvas bisa menangkapnya
+            // Masalah "kosong" biasanya karena element parentnya hidden atau left: -9999px
+            element.style.display = 'block';
+            element.style.position = 'fixed';
+            element.style.top = '0';
+            element.style.left = '0';
+            element.style.zIndex = '99999'; // Pastikan paling atas
+            element.style.background = '#fff';
+            element.style.width = '78mm'; // Sesuai ukuran struk
+            element.style.height = 'auto'; // Auto height
+            element.removeAttribute('id'); // Hapus ID agar tidak konflik
+
+            document.body.appendChild(element);
+
+            // 3. Hitung tinggi konten untuk PDF custom size
+            const contentHeight = element.scrollHeight;
+            const heightMM = (contentHeight * 0.264583) + 10; // convert px to mm + padding
 
             const opt = {
                 margin:       0,
                 filename:     `Struk_AB_V3_${userName}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
-                jsPDF:        { unit: 'mm', format: [80, contentHeightMM] } // Dynamic Height
+                html2canvas:  { scale: 2, useCORS: true, logging: false },
+                jsPDF:        { unit: 'mm', format: [80, heightMM], orientation: 'portrait' }
             };
 
-            // Hack: Tampilkan sementara agar html2pdf bisa render
-            receiptDiv.style.left = '0';
-            receiptDiv.style.zIndex = '99999';
-            receiptDiv.style.backgroundColor = '#fff';
-
-            html2pdf().set(opt).from(receiptDiv).save().then(() => {
-                // Sembunyikan kembali
-                receiptDiv.style.left = '-9999px';
+            // 4. Generate PDF lalu hapus elemen clone
+            html2pdf().set(opt).from(element).save().then(() => {
+                document.body.removeChild(element);
             });
         }
 
+        // --- FIXED EXCEL EXPORT (MIRROR RECEIPT STRUCTURE) ---
         function exportToExcel() {
-            hitung();
+            renderReceiptHTML(); // Update data
+            const userName = document.getElementById('inputNama').value;
+            const now = new Date();
+            const receiptId = window.currentReceiptId || "RCP-000";
+
             let csv = "data:text/csv;charset=utf-8,";
             
-            // Header Info
-            const userName = document.getElementById('inputNama').value;
-            csv += `ARIEZONA BUDGET V.3\n`;
-            csv += `User,${userName}\n`;
-            csv += `Date,${new Date().toLocaleDateString()}\n\n`;
-
-            // Function helper for sections
-            function addSection(title, inputs, isMinus=false) {
-                let sectionContent = "";
-                let hasData = false;
-                inputs.forEach(input => {
-                    let val = parseLocaleNumber(input.value);
-                    if(val > 0) {
-                        hasData = true;
-                        let label = getLabelName(input).replace(':', '');
-                        let sign = isMinus ? "-" : "";
-                        sectionContent += `${label},"${sign}${formatNumber(val)}"\n`;
-                    }
-                });
-                if(hasData) {
-                    csv += `--- ${title} ---\n` + sectionContent + "\n";
-                }
+            // Helper function
+            function addRow(label, value) {
+                // Menghapus titik pada value untuk Excel (opsional, tapi format text "Rp 1.000" lebih aman)
+                // Di sini kita biarkan format string agar sama persis dengan struk
+                csv += `"${label}","${value}"\n`;
             }
 
-            // INCOME
-            let incomeList = document.querySelectorAll('.income-group');
-            addSection("PEMASUKAN & SALDO", incomeList);
+            // --- HEADER ---
+            csv += `ARIEZONA BUDGET V.3 (Receipt Export)\n`;
+            csv += `User,${userName}\n`;
+            csv += `Date,${now.toLocaleDateString('id-ID')}\n`;
+            csv += `Time,${now.toLocaleTimeString('id-ID')}\n`;
+            csv += `ID,${receiptId}\n`;
+            csv += `\n`; 
 
-            // DEBT
-            let debtList = document.querySelectorAll('.debt');
-            addSection("KEWAJIBAN (HUTANG)", debtList, true);
+            // --- 1. PEMASUKAN ---
+            csv += `--- PEMASUKAN ---\n`;
+            addRow("Gaji/Income", document.getElementById('gaji').value || "0");
+            addRow("Saldo Awal", document.getElementById('saldoLalu').value || "0");
+            csv += `\n`;
 
-            // EXPENSE
-            let expList = document.querySelectorAll('.expense');
-            addSection("PENGELUARAN RUTIN", expList, true);
+            // --- 2. HUTANG ---
+            let hasDebt = false;
+            document.querySelectorAll('.debt').forEach(input => {
+                let val = parseLocaleNumber(input.value);
+                if(val > 0) {
+                    if(!hasDebt) { csv += `--- KEWAJIBAN (HUTANG) ---\n`; hasDebt = true; }
+                    addRow(getLabelName(input).replace(':', ''), "-" + formatNumber(val));
+                }
+            });
+            if(hasDebt) csv += `\n`;
 
-            // SAVINGS
-            let saveList = document.querySelectorAll('.savings-flow');
-            addSection("TABUNGAN (ASET)", saveList);
+            // --- 3. PENGELUARAN ---
+            let hasExp = false;
+            document.querySelectorAll('.expense').forEach(input => {
+                let val = parseLocaleNumber(input.value);
+                if(val > 0) {
+                    if(!hasExp) { csv += `--- PENGELUARAN RUTIN ---\n`; hasExp = true; }
+                    addRow(getLabelName(input).replace(':', ''), "-" + formatNumber(val));
+                }
+            });
+            if(hasExp) csv += `\n`;
 
-            // TOTALS
+            // --- 4. TABUNGAN ---
+            let hasSave = false;
+            document.querySelectorAll('.savings-flow').forEach(input => {
+                let val = parseLocaleNumber(input.value);
+                if(val > 0) {
+                    if(!hasSave) { csv += `--- TABUNGAN (SAVING) ---\n`; hasSave = true; }
+                    addRow(getLabelName(input).replace(':', ''), formatNumber(val));
+                }
+            });
+            if(hasSave) csv += `\n`;
+
+            // --- 5. RINGKASAN ---
             csv += `--- RINGKASAN ---\n`;
-            csv += `Total Pengeluaran,"${document.getElementById('resTotalKeluar').innerText}"\n`;
-            csv += `Sisa Cash,"${document.getElementById('resSisa').innerText}"\n`;
-            csv += `TOTAL ASET NET,"${document.getElementById('resTotalAset').innerText}"\n`;
-            csv += `Status,"${document.getElementById('financialStatus').innerText}"\n`;
+            addRow("TOTAL BEBAN", document.getElementById('resTotalKeluar').innerText);
+            addRow("SISA CASH", document.getElementById('resSisa').innerText);
+            csv += `\n`;
+            addRow("TOTAL ASET (NET)", document.getElementById('resTotalAset').innerText);
+            addRow("Status Keuangan", document.getElementById('financialStatus').innerText);
 
+            // Download CSV
             const link = document.createElement("a");
             link.setAttribute("href", encodeURI(csv));
-            link.setAttribute("download", `Laporan_Ariezona_V3_${userName}.csv`);
+            link.setAttribute("download", `Struk_AB_V3_${userName}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
