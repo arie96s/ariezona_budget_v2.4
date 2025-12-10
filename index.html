@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ARIEZONA Budget V.3</title>
+    <title>ARIEZONA Budget V.3 - Win95</title>
     
     <link rel="icon" type="image/png" href="New Project.png">
     
@@ -88,6 +88,7 @@
             border-bottom: 2px solid #fff;
             border-right: 2px solid #fff;
             box-shadow: inset 2px 2px 0px #000;
+            text-align: center !important; /* REQUEST: Teks ditengah */
         }
         
         .search-input::placeholder { color: #808080; }
@@ -307,8 +308,6 @@
             outline: none; border-bottom: 1px solid #000 !important; background: #fff !important;
         }
 
-        .search-input { text-align: left !important; font-weight: normal; }
-
         /* --- RESULT LAYOUT --- */
         .result-container-split {
             display: none; margin-top: 20px; border-top: 2px dashed #000;
@@ -439,46 +438,11 @@
         .cal-red { color: darkred; font-weight: bold; }
         .cal-blue { color: darkblue; font-weight: bold; }
 
-        /* --- STRUK / RECEIPT --- */
-        #receipt-hidden {
-            position: absolute;
-            left: -9999px;
-            top: 0;
-            width: 78mm;
-            background-color: #fff;
-            padding: 2mm;
-            font-family: 'VT323', monospace; 
-            font-size: 14px;
-            color: #000;
-            line-height: 1.2;
-            box-sizing: border-box;
-            border: 1px solid #eee;
+        /* --- PRINT STRUK (A4) --- */
+        #print-only-container {
+            display: none;
         }
 
-        .receipt-center { text-align: center; }
-        .receipt-line { display: flex; justify-content: space-between; margin-bottom: 3px; }
-        .receipt-divider { border-bottom: 2px dashed #000; margin: 8px 0; display: block; height: 1px; }
-        .receipt-divider-double { border-bottom: 4px double #000; margin: 8px 0; }
-        .receipt-section { margin-top: 10px; text-transform: uppercase; font-weight: bold; border-bottom: 1px solid #000; display: inline-block; margin-bottom: 5px;}
-        .receipt-total { font-size: 18px; margin-top: 5px; font-weight: bold; }
-        .receipt-message {
-            margin-top: 15px;
-            text-align: center;
-            font-size: 12px;
-            font-style: italic;
-            border: 2px solid #000;
-            padding: 5px;
-            border-radius: 5px;
-        }
-        .receipt-logo-img {
-            width: 50%;
-            height: auto;
-            margin: 0 auto 5px auto;
-            display: block;
-            filter: grayscale(100%) contrast(150%);
-        }
-
-        /* --- PRINT MEDIA QUERY --- */
         @media print {
             body { 
                 background: white; 
@@ -489,16 +453,26 @@
             #landing-page, #win95-modal-overlay, #main-window, #calc-popup { 
                 display: none !important; 
             }
-            #receipt-hidden {
+            #print-only-container {
                 display: block !important;
-                position: relative !important;
-                left: auto !important;
-                top: auto !important;
-                margin: 0 auto;
                 width: 100%;
-                max-width: 80mm;
-                border: none;
+                max-width: 210mm; /* A4 Width */
+                margin: 0 auto;
+                font-family: 'VT323', monospace;
+                color: #000;
+                padding: 20px;
+                box-sizing: border-box;
             }
+            .print-header { text-align: center; margin-bottom: 20px; border-bottom: 3px double #000; padding-bottom: 10px; }
+            .print-logo { width: 100px; height: auto; display: block; margin: 0 auto; }
+            .print-title { font-size: 24px; font-weight: bold; margin-top: 10px; }
+            .print-info { display: flex; justify-content: space-between; border-bottom: 1px solid #000; margin-bottom: 15px; padding-bottom: 5px; }
+            .print-section { margin-top: 15px; }
+            .print-section-title { font-weight: bold; text-decoration: underline; font-size: 18px; margin-bottom: 5px; }
+            .print-row { display: flex; justify-content: space-between; margin-bottom: 3px; font-size: 16px; }
+            .print-total-box { border: 2px solid #000; padding: 10px; margin-top: 20px; text-align: right; }
+            .print-total-row { font-size: 20px; font-weight: bold; margin-bottom: 5px; }
+            .print-footer { text-align: center; margin-top: 30px; font-style: italic; font-size: 14px; }
         }
     </style>
 </head>
@@ -538,7 +512,7 @@
         </div>
     </div>
 
-    <div id="receipt-hidden"></div>
+    <div id="print-only-container"></div>
 
     <div id="win95-modal-overlay">
         <div class="win95-popup">
@@ -563,7 +537,7 @@
         </div>
         <div class="search-box-container">
             <span style="font-weight:bold; margin-right:5px; font-size: 1.4rem;">User:</span>
-            <input type="text" id="inputNama" placeholder="Nama Kamu" class="search-input">
+            <input type="text" id="inputNama" placeholder="Isi Nama Kamu ..." class="search-input">
             <button class="btn-win95" onclick="openApp()">START</button>
         </div>
     </div>
@@ -740,10 +714,8 @@
         function dragElement(elmnt) {
             let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
             const header = document.getElementById(elmnt.id + "-header") || elmnt;
-            
             header.onmousedown = dragMouseDown;
             header.ontouchstart = dragMouseDown;
-
             function dragMouseDown(e) {
                 e = e || window.event;
                 const clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -755,10 +727,8 @@
                 document.ontouchend = closeDragElement;
                 document.ontouchmove = elementDrag;
             }
-
             function elementDrag(e) {
                 e = e || window.event;
-                if (e.type === 'touchmove') {} 
                 const clientX = e.touches ? e.touches[0].clientX : e.clientX;
                 const clientY = e.touches ? e.touches[0].clientY : e.clientY;
                 pos1 = pos3 - clientX;
@@ -769,12 +739,8 @@
                 elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
                 elmnt.style.right = 'auto'; 
             }
-
             function closeDragElement() {
-                document.onmouseup = null;
-                document.onmousemove = null;
-                document.ontouchend = null;
-                document.ontouchmove = null;
+                document.onmouseup = null; document.onmousemove = null; document.ontouchend = null; document.ontouchmove = null;
             }
         }
         dragElement(document.getElementById("calc-popup"));
@@ -788,9 +754,7 @@
             } else {
                 calcPopup.style.display = 'flex';
                 if(calcPopup.offsetLeft < 0 || calcPopup.offsetTop < 0) {
-                   calcPopup.style.top = '20%';
-                   calcPopup.style.left = 'auto';
-                   calcPopup.style.right = '5%';
+                   calcPopup.style.top = '20%'; calcPopup.style.left = 'auto'; calcPopup.style.right = '5%';
                 }
                 void calcPopup.offsetWidth;
                 calcPopup.classList.add('show-calc');
@@ -855,14 +819,8 @@
                 return;
             }
             const accessTime = new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' });
-            const templateParams = {
-                from_name: namaUser,
-                message: `User Login: ${namaUser}`,
-                device_info: getMobileOS(),
-                access_time: accessTime
-            };
-            emailjs.send("user_info", "template_uk6i1uy", templateParams)
-                .then(function(res){ console.log('Email Sent', res.status); }, function(err){ console.log('Email Fail', err); });
+            const templateParams = { from_name: namaUser, message: `User Login: ${namaUser}`, device_info: getMobileOS(), access_time: accessTime };
+            emailjs.send("user_info", "template_uk6i1uy", templateParams).then(null, function(err){ console.log('Email Fail', err); });
 
             document.getElementById('windowTitle').innerText = `Budget_Pro V.3 - [${namaUser}]`;
             const landing = document.getElementById('landing-page');
@@ -930,21 +888,13 @@
             const statusEl = document.getElementById('financialStatus');
             let statusCode = "";
             if (sisaCash < 0) {
-                statusEl.innerText = "BAHAYA (DEFISIT)";
-                statusEl.style.color = "red";
-                statusCode = "danger";
+                statusEl.innerText = "BAHAYA (DEFISIT)"; statusEl.style.color = "red"; statusCode = "danger";
             } else if (tabunganBaru > 0 && totalHutang === 0) {
-                statusEl.innerText = "SEHAT & TUMBUH";
-                statusEl.style.color = "green";
-                statusCode = "success";
+                statusEl.innerText = "SEHAT & TUMBUH"; statusEl.style.color = "green"; statusCode = "success";
             } else if (tabunganBaru > 0 && totalHutang > 0) {
-                statusEl.innerText = "MODERAT (Ada Hutang)";
-                statusEl.style.color = "#a0a000";
-                statusCode = "warning";
+                statusEl.innerText = "MODERAT (Ada Hutang)"; statusEl.style.color = "#a0a000"; statusCode = "warning";
             } else {
-                statusEl.innerText = "SURVIVING (Pas-pasan)";
-                statusEl.style.color = "black";
-                statusCode = "neutral";
+                statusEl.innerText = "SURVIVING (Pas-pasan)"; statusEl.style.color = "black"; statusCode = "neutral";
             }
             statusEl.setAttribute("data-status-code", statusCode);
 
@@ -953,18 +903,11 @@
             setTimeout(() => { winBody.scrollTo({ top: winBody.scrollHeight, behavior: 'smooth' }); }, 100);
         }
 
-        // --- RECEIPT GENERATION HELPERS ---
+        // --- HELPERS ---
         function getLabelName(inputElement) {
             const sibling = inputElement.previousElementSibling;
             if(!sibling) return "Item";
             return (sibling.tagName === 'INPUT') ? (sibling.value || "Lain-lain") : sibling.innerText;
-        }
-
-        function generateReceiptItem(inputElement, isMinus = false) {
-            const val = parseLocaleNumber(inputElement.value);
-            if(val <= 0) return '';
-            const labelName = getLabelName(inputElement).replace(':', '').substring(0, 22);
-            return `<div class="receipt-line"><span>${labelName}</span><span>${(isMinus ? '-' : '') + formatNumber(val)}</span></div>`;
         }
 
         function getRandomMessage(statusCode) {
@@ -978,202 +921,316 @@
             return list[Math.floor(Math.random() * list.length)];
         }
 
-        // --- RENDER RECEIPT FUNCTION ---
-        function renderReceiptHTML() {
+        // --- PRINT BROWSER (A4 Size) ---
+        function doPrintReceipt() {
             hitung();
             const userName = document.getElementById('inputNama').value || 'User';
             const now = new Date();
-            // Simpan ID agar konsisten jika dipanggil berulang
-            if (!window.currentReceiptId) {
-                window.currentReceiptId = "RCP-" + Math.floor(Math.random() * 1000000);
-            }
-            const receiptId = window.currentReceiptId;
+            const receiptId = "RCP-" + Math.floor(Math.random() * 1000000);
             
-            const gaji = document.getElementById('gaji').value || "0";
-            const saldoLalu = document.getElementById('saldoLalu').value || "0";
+            // Build A4 HTML Structure
+            let html = `
+                <div class="print-header">
+                    <img src="ariezona_budget_logo_black.png" alt="ARIEZONA" class="print-logo" onerror="this.style.display='none'">
+                    <div class="print-title">ARIEZONA BUDGET - FINANCIAL REPORT</div>
+                </div>
+                <div class="print-info">
+                    <span>User: ${userName}</span>
+                    <span>Date: ${now.toLocaleDateString('id-ID')}</span>
+                </div>
+                <div class="print-info">
+                    <span>ID: ${receiptId}</span>
+                    <span>Time: ${now.toLocaleTimeString('id-ID')}</span>
+                </div>
+            `;
+
+            const sections = [
+                { title: "PEMASUKAN", selector: null, type: 'manual' },
+                { title: "KEWAJIBAN (HUTANG)", selector: '.debt', type: 'auto' },
+                { title: "PENGELUARAN RUTIN", selector: '.expense', type: 'auto' },
+                { title: "TABUNGAN (SAVING)", selector: '.savings-flow', type: 'auto' }
+            ];
+
+            sections.forEach(sec => {
+                html += `<div class="print-section"><div class="print-section-title">${sec.title}</div>`;
+                if(sec.type === 'manual') {
+                    html += `<div class="print-row"><span>Gaji/Income</span><span>${document.getElementById('gaji').value || "0"}</span></div>`;
+                    html += `<div class="print-row"><span>Saldo Awal</span><span>${document.getElementById('saldoLalu').value || "0"}</span></div>`;
+                } else {
+                    document.querySelectorAll(sec.selector).forEach(input => {
+                        let val = parseLocaleNumber(input.value);
+                        if(val > 0) {
+                            let label = getLabelName(input).replace(':', '');
+                            html += `<div class="print-row"><span>${label}</span><span>${formatNumber(val)}</span></div>`;
+                        }
+                    });
+                }
+                html += `</div>`;
+            });
+
             const resTotalKeluar = document.getElementById('resTotalKeluar').innerText;
-            const resTotalAset = document.getElementById('resTotalAset').innerText;
             const resSisa = document.getElementById('resSisa').innerText;
+            const resTotalAset = document.getElementById('resTotalAset').innerText;
+            const status = document.getElementById('financialStatus').innerText;
+
+            html += `
+                <div class="print-total-box">
+                    <div class="print-row"><span>TOTAL BEBAN:</span><span>${resTotalKeluar}</span></div>
+                    <div class="print-row"><span>SISA CASH:</span><span>${resSisa}</span></div>
+                    <hr>
+                    <div class="print-total-row">TOTAL ASET NET: ${resTotalAset}</div>
+                    <div style="font-size:16px;">Status: <b>${status}</b></div>
+                </div>
+                <div class="print-footer">
+                    "${getRandomMessage(document.getElementById('financialStatus').getAttribute("data-status-code"))}"
+                    <br><br>
+                    * Laporan ini dicetak secara otomatis oleh sistem ArieZona Budget *
+                </div>
+            `;
+
+            document.getElementById('print-only-container').innerHTML = html;
+            setTimeout(() => { window.print(); }, 500);
+        }
+
+        // --- PDF GENERATION (Shopping Receipt Style) ---
+        function exportToPDF() {
+            hitung();
+            const userName = document.getElementById('inputNama').value || 'User';
+            const now = new Date();
+            const receiptId = "RCP-" + Math.floor(Math.random() * 1000000);
             const status = document.getElementById('financialStatus').innerText;
             const statusCode = document.getElementById('financialStatus').getAttribute("data-status-code");
             const randomMsg = getRandomMessage(statusCode);
 
-            let html = `
-                <div class="receipt-center">
-                    <img src="ariezona_budget_logo.png" alt="ARIEZONA" class="receipt-logo-img" onerror="this.style.display='none'">
-                    <div style="font-weight:bold; font-size:1.2em;">ARIEZONA BUDGET</div>
-                </div>
-                <div class="receipt-center">V.3.0 (Win95 Edition)</div>
-                <div class="receipt-divider"></div>
-                <div class="receipt-line"><span>Date:</span><span>${now.toLocaleDateString('id-ID')}</span></div>
-                <div class="receipt-line"><span>Time:</span><span>${now.toLocaleTimeString('id-ID')}</span></div>
-                <div class="receipt-line"><span>User:</span><span>${userName}</span></div>
-                <div class="receipt-line"><span>ID:</span><span>${receiptId}</span></div>
-                <div class="receipt-divider-double"></div>
-            `;
-
-            html += `<div class="receipt-section">PEMASUKAN</div>`;
-            html += `<div class="receipt-line"><span>Gaji/Income</span><span>${gaji}</span></div>`;
-            html += `<div class="receipt-line"><span>Saldo Awal</span><span>${saldoLalu}</span></div>`;
-
-            let debtHTML = '';
-            document.querySelectorAll('.debt').forEach(input => {
-                const row = generateReceiptItem(input, true);
-                if(row) debtHTML += row;
-            });
-            if(debtHTML) html += `<div class="receipt-section">KEWAJIBAN (HUTANG)</div>` + debtHTML;
-
-            let expHTML = '';
-            document.querySelectorAll('.expense').forEach(input => {
-                const row = generateReceiptItem(input, true);
-                if(row) expHTML += row;
-            });
-            if(expHTML) html += `<div class="receipt-section">PENGELUARAN RUTIN</div>` + expHTML;
-
-            let saveHTML = '';
-            document.querySelectorAll('.savings-flow').forEach(input => {
-                const row = generateReceiptItem(input);
-                if(row) saveHTML += row;
-            });
-            if(saveHTML) html += `<div class="receipt-section">TABUNGAN (SAVING)</div>` + saveHTML;
-
-            html += `
-                <div class="receipt-divider"></div>
-                <div class="receipt-line" style="font-weight:bold"><span>TOTAL BEBAN:</span><span>${resTotalKeluar}</span></div>
-                <div class="receipt-line" style="font-weight:bold"><span>SISA CASH:</span><span>${resSisa}</span></div>
-                <div class="receipt-divider-double"></div>
-                <div class="receipt-line receipt-total" style="font-weight:bold"><span>TOTAL ASET:</span><span>${resTotalAset}</span></div>
-                <div class="receipt-center" style="margin-top:10px;">Status:</div>
-                <div class="receipt-center" style="font-weight:bold">[ ${status} ]</div>
-                <div class="receipt-message">"${randomMsg}"</div>
-                <div class="receipt-center" style="margin-top:20px; font-size:14px;">* TERIMA KASIH *</div>
-            `;
+            // REQUEST: Logo overlay 100% top, Watermark pattern 25% overlay
+            // REQUEST: List pas ditengah (Centered)
             
-            document.getElementById('receipt-hidden').innerHTML = html;
-        }
+            // Create a dedicated container element in memory/DOM
+            const container = document.createElement('div');
+            container.style.width = '80mm';
+            container.style.padding = '0';
+            container.style.margin = '0 auto';
+            container.style.backgroundColor = '#fff';
+            container.style.fontFamily = "'VT323', monospace";
+            container.style.color = '#000';
+            container.style.position = 'relative';
+            container.style.overflow = 'hidden';
 
-        function doPrintReceipt() {
-            renderReceiptHTML();
-            setTimeout(() => { window.print(); }, 500);
-        }
+            // Watermark Layer (Pattern)
+            const watermark = document.createElement('div');
+            watermark.style.position = 'absolute';
+            watermark.style.top = '0';
+            watermark.style.left = '0';
+            watermark.style.width = '100%';
+            watermark.style.height = '100%';
+            watermark.style.backgroundImage = "url('ariezona_budget_logo_black.png')";
+            watermark.style.backgroundRepeat = 'repeat';
+            watermark.style.backgroundSize = '50px'; // Small repeating pattern
+            watermark.style.opacity = '0.25'; // 25% Overlay
+            watermark.style.zIndex = '0';
+            container.appendChild(watermark);
 
-        // --- FIXED PDF EXPORT FUNCTION ---
-        // Memperbaiki masalah struk kosong dengan teknik cloning ke layer visible sementara
-        function exportToPDF() {
-            renderReceiptHTML(); 
-            const source = document.getElementById('receipt-hidden'); // Perbaikan ID dari receipt-show ke receipt-hidden
-            const userName = document.getElementById('inputNama').value || 'User';
+            // Content Layer
+            const content = document.createElement('div');
+            content.style.position = 'relative';
+            content.style.zIndex = '1';
+            content.style.padding = '10px';
+            content.style.textAlign = 'center'; // CENTER EVERYTHING REQUEST
 
-            // 1. Clone element agar bisa dimodifikasi style-nya tanpa merusak layout asli
-            const element = source.cloneNode(true);
+            // Helper to add lines
+            const addLine = (text, isBold = false, fontSize = '16px') => {
+                const p = document.createElement('div');
+                p.innerText = text;
+                p.style.fontSize = fontSize;
+                p.style.lineHeight = '1.2';
+                if(isBold) p.style.fontWeight = 'bold';
+                content.appendChild(p);
+            };
+            const addDivider = () => {
+                const d = document.createElement('div');
+                d.style.borderBottom = '1px dashed #000';
+                d.style.margin = '5px 0';
+                content.appendChild(d);
+            };
+
+            // Header Logo (100% Overlay)
+            const img = document.createElement('img');
+            img.src = 'ariezona_budget_logo_black.png';
+            img.style.width = '60px';
+            img.style.display = 'block';
+            img.style.margin = '0 auto 5px auto';
+            img.onerror = function() { this.style.display = 'none'; };
+            content.appendChild(img);
+
+            addLine("ARIEZONA BUDGET V.3", true, "18px");
+            addLine("Original Receipt", false, "12px");
+            addDivider();
             
-            // 2. Buat element terlihat di layar (overlay) agar html2canvas bisa menangkapnya
-            // Masalah "kosong" biasanya karena element parentnya hidden atau left: -9999px
-            element.style.display = 'block';
-            element.style.position = 'fixed';
-            element.style.top = '0';
-            element.style.left = '0';
-            element.style.zIndex = '99999'; // Pastikan paling atas
-            element.style.background = '#fff';
-            element.style.width = '78mm'; // Sesuai ukuran struk
-            element.style.height = 'auto'; // Auto height
-            element.removeAttribute('id'); // Hapus ID agar tidak konflik
+            // Meta Data (Centered)
+            addLine(now.toLocaleDateString('id-ID'));
+            addLine(now.toLocaleTimeString('id-ID'));
+            addLine("User: " + userName);
+            addLine("ID: " + receiptId);
+            addDivider();
 
-            document.body.appendChild(element);
+            // Items (Centered: Name then Value)
+            const addSection = (title) => {
+                const d = document.createElement('div');
+                d.innerText = `[ ${title} ]`;
+                d.style.fontWeight = 'bold';
+                d.style.marginTop = '10px';
+                d.style.marginBottom = '5px';
+                content.appendChild(d);
+            };
 
-            // 3. Hitung tinggi konten untuk PDF custom size
-            const contentHeight = element.scrollHeight;
-            const heightMM = (contentHeight * 0.264583) + 10; // convert px to mm + padding
+            const addItem = (label, val, isMinus=false) => {
+                if(val <= 0) return;
+                const div = document.createElement('div');
+                div.style.marginBottom = '3px';
+                div.innerHTML = `<div>${label}</div><div style="font-weight:bold">${isMinus?'-':''}${formatNumber(val)}</div>`;
+                content.appendChild(div);
+            };
+
+            // Pemasukan
+            addSection("PEMASUKAN");
+            addItem("Gaji / Income", parseLocaleNumber(document.getElementById('gaji').value));
+            addItem("Saldo Awal", parseLocaleNumber(document.getElementById('saldoLalu').value));
+
+            // Hutang
+            let hasDebt = false;
+            document.querySelectorAll('.debt').forEach(i => { if(parseLocaleNumber(i.value) > 0) hasDebt = true; });
+            if(hasDebt) {
+                addSection("BAYAR HUTANG");
+                document.querySelectorAll('.debt').forEach(i => addItem(getLabelName(i).replace(':',''), parseLocaleNumber(i.value), true));
+            }
+
+            // Pengeluaran
+            let hasExp = false;
+            document.querySelectorAll('.expense').forEach(i => { if(parseLocaleNumber(i.value) > 0) hasExp = true; });
+            if(hasExp) {
+                addSection("PENGELUARAN");
+                document.querySelectorAll('.expense').forEach(i => addItem(getLabelName(i).replace(':',''), parseLocaleNumber(i.value), true));
+            }
+
+            // Tabungan
+            let hasSave = false;
+            document.querySelectorAll('.savings-flow').forEach(i => { if(parseLocaleNumber(i.value) > 0) hasSave = true; });
+            if(hasSave) {
+                addSection("TABUNGAN");
+                document.querySelectorAll('.savings-flow').forEach(i => addItem(getLabelName(i).replace(':',''), parseLocaleNumber(i.value)));
+            }
+
+            addDivider();
+            addLine("TOTAL BEBAN", false, "14px");
+            addLine(document.getElementById('resTotalKeluar').innerText, true, "18px");
+            
+            addLine("SISA CASH", false, "14px");
+            addLine(document.getElementById('resSisa').innerText, true, "18px");
+
+            const totalAsetDiv = document.createElement('div');
+            totalAsetDiv.style.border = '2px solid #000';
+            totalAsetDiv.style.padding = '5px';
+            totalAsetDiv.style.marginTop = '10px';
+            totalAsetDiv.style.marginBottom = '10px';
+            totalAsetDiv.innerHTML = `<div style="font-size:12px">TOTAL ASET NET</div><div style="font-size:20px; font-weight:bold">${document.getElementById('resTotalAset').innerText}</div>`;
+            content.appendChild(totalAsetDiv);
+
+            addLine("Status: " + status, true);
+            
+            // Random Motivation
+            const msgDiv = document.createElement('div');
+            msgDiv.innerText = `"${randomMsg}"`;
+            msgDiv.style.fontStyle = 'italic';
+            msgDiv.style.marginTop = '15px';
+            msgDiv.style.fontSize = '12px';
+            msgDiv.style.borderTop = '1px dotted #000';
+            msgDiv.style.paddingTop = '5px';
+            content.appendChild(msgDiv);
+
+            addLine("TERIMA KASIH", true, "14px");
+
+            container.appendChild(content);
+
+            // Append to body temporarily to render
+            document.body.appendChild(container);
+            container.style.position = 'absolute';
+            container.style.left = '-9999px'; // Hide from view but keep in DOM
+            container.style.top = '0';
 
             const opt = {
                 margin:       0,
                 filename:     `Struk_AB_V3_${userName}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, logging: false },
-                jsPDF:        { unit: 'mm', format: [80, heightMM], orientation: 'portrait' }
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: [80, 200], orientation: 'portrait' } // Long thermal paper format
             };
 
-            // 4. Generate PDF lalu hapus elemen clone
-            html2pdf().set(opt).from(element).save().then(() => {
-                document.body.removeChild(element);
+            // Calculate height manually if needed, or let PDF auto page
+            // For simple thermal receipt, we often want one long page.
+            // Using a fixed height for simplicity or we can calculate.
+            const elementHeight = content.offsetHeight + 50; 
+            opt.jsPDF.format = [80, (elementHeight * 0.264583) + 20]; // px to mm
+
+            html2pdf().set(opt).from(container).save().then(() => {
+                document.body.removeChild(container);
             });
         }
 
-        // --- FIXED EXCEL EXPORT (MIRROR RECEIPT STRUCTURE) ---
+        // --- EXCEL EXPORT (NEAT FORMAT) ---
         function exportToExcel() {
-            renderReceiptHTML(); // Update data
+            hitung();
             const userName = document.getElementById('inputNama').value;
             const now = new Date();
-            const receiptId = window.currentReceiptId || "RCP-000";
+            const receiptId = "RCP-" + Math.floor(Math.random() * 1000000);
 
+            // CSV Header
             let csv = "data:text/csv;charset=utf-8,";
-            
-            // Helper function
-            function addRow(label, value) {
-                // Menghapus titik pada value untuk Excel (opsional, tapi format text "Rp 1.000" lebih aman)
-                // Di sini kita biarkan format string agar sama persis dengan struk
-                csv += `"${label}","${value}"\n`;
+            csv += "ARIEZONA BUDGET V.3 - FINANCIAL REPORT\n";
+            csv += "User," + userName + "\n";
+            csv += "Date," + now.toLocaleDateString('id-ID') + "\n";
+            csv += "Time," + now.toLocaleTimeString('id-ID') + "\n\n";
+
+            // Helper
+            function addSection(title) { csv += title + ",AMOUNT (Rp)\n"; }
+            function addRow(label, val, isMinus) {
+                if(val <= 0) return;
+                // Remove formatting for excel math if needed, but string is requested
+                let sign = isMinus ? "-" : "";
+                csv += `"${label.replace(':','')}","${sign}${formatNumber(val)}"\n`;
             }
 
-            // --- HEADER ---
-            csv += `ARIEZONA BUDGET V.3 (Receipt Export)\n`;
-            csv += `User,${userName}\n`;
-            csv += `Date,${now.toLocaleDateString('id-ID')}\n`;
-            csv += `Time,${now.toLocaleTimeString('id-ID')}\n`;
-            csv += `ID,${receiptId}\n`;
-            csv += `\n`; 
+            // Pemasukan
+            addSection("--- PEMASUKAN ---");
+            addRow("Gaji", parseLocaleNumber(document.getElementById('gaji').value));
+            addRow("Saldo Awal", parseLocaleNumber(document.getElementById('saldoLalu').value));
+            csv += "\n";
 
-            // --- 1. PEMASUKAN ---
-            csv += `--- PEMASUKAN ---\n`;
-            addRow("Gaji/Income", document.getElementById('gaji').value || "0");
-            addRow("Saldo Awal", document.getElementById('saldoLalu').value || "0");
-            csv += `\n`;
+            // Hutang
+            addSection("--- KEWAJIBAN ---");
+            document.querySelectorAll('.debt').forEach(i => addRow(getLabelName(i), parseLocaleNumber(i.value), true));
+            csv += "\n";
 
-            // --- 2. HUTANG ---
-            let hasDebt = false;
-            document.querySelectorAll('.debt').forEach(input => {
-                let val = parseLocaleNumber(input.value);
-                if(val > 0) {
-                    if(!hasDebt) { csv += `--- KEWAJIBAN (HUTANG) ---\n`; hasDebt = true; }
-                    addRow(getLabelName(input).replace(':', ''), "-" + formatNumber(val));
-                }
-            });
-            if(hasDebt) csv += `\n`;
+            // Pengeluaran
+            addSection("--- PENGELUARAN ---");
+            document.querySelectorAll('.expense').forEach(i => addRow(getLabelName(i), parseLocaleNumber(i.value), true));
+            csv += "\n";
 
-            // --- 3. PENGELUARAN ---
-            let hasExp = false;
-            document.querySelectorAll('.expense').forEach(input => {
-                let val = parseLocaleNumber(input.value);
-                if(val > 0) {
-                    if(!hasExp) { csv += `--- PENGELUARAN RUTIN ---\n`; hasExp = true; }
-                    addRow(getLabelName(input).replace(':', ''), "-" + formatNumber(val));
-                }
-            });
-            if(hasExp) csv += `\n`;
+            // Saving
+            addSection("--- TABUNGAN ---");
+            document.querySelectorAll('.savings-flow').forEach(i => addRow(getLabelName(i), parseLocaleNumber(i.value)));
+            csv += "\n";
 
-            // --- 4. TABUNGAN ---
-            let hasSave = false;
-            document.querySelectorAll('.savings-flow').forEach(input => {
-                let val = parseLocaleNumber(input.value);
-                if(val > 0) {
-                    if(!hasSave) { csv += `--- TABUNGAN (SAVING) ---\n`; hasSave = true; }
-                    addRow(getLabelName(input).replace(':', ''), formatNumber(val));
-                }
-            });
-            if(hasSave) csv += `\n`;
+            // Summary
+            csv += "--- RINGKASAN ---\n";
+            csv += `TOTAL BEBAN,"${document.getElementById('resTotalKeluar').innerText}"\n`;
+            csv += `SISA CASH,"${document.getElementById('resSisa').innerText}"\n`;
+            csv += `TOTAL ASET,"${document.getElementById('resTotalAset').innerText}"\n`;
+            csv += `STATUS,"${document.getElementById('financialStatus').innerText}"\n`;
 
-            // --- 5. RINGKASAN ---
-            csv += `--- RINGKASAN ---\n`;
-            addRow("TOTAL BEBAN", document.getElementById('resTotalKeluar').innerText);
-            addRow("SISA CASH", document.getElementById('resSisa').innerText);
-            csv += `\n`;
-            addRow("TOTAL ASET (NET)", document.getElementById('resTotalAset').innerText);
-            addRow("Status Keuangan", document.getElementById('financialStatus').innerText);
-
-            // Download CSV
+            const encodedUri = encodeURI(csv);
             const link = document.createElement("a");
-            link.setAttribute("href", encodeURI(csv));
-            link.setAttribute("download", `Struk_AB_V3_${userName}.csv`);
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Laporan_AB_${userName}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
