@@ -992,7 +992,7 @@
             setTimeout(() => { window.print(); }, 500);
         }
 
-        // --- PDF GENERATION (Shopping Receipt Style) ---
+        // --- PDF GENERATION (FIXED) ---
         function exportToPDF() {
             hitung();
             const userName = document.getElementById('inputNama').value || 'User';
@@ -1002,31 +1002,30 @@
             const statusCode = document.getElementById('financialStatus').getAttribute("data-status-code");
             const randomMsg = getRandomMessage(statusCode);
 
-            // REQUEST: Logo overlay 100% top, Watermark pattern 25% overlay
-            // REQUEST: List pas ditengah (Centered)
-            
             // Create a dedicated container element in memory/DOM
             const container = document.createElement('div');
-            container.style.width = '80mm';
+            // Set width sedikit lebih besar dari format PDF agar tidak terpotong
+            container.style.width = '79mm'; 
             container.style.padding = '0';
-            container.style.margin = '0 auto';
+            container.style.margin = '0'; // Reset margin
             container.style.backgroundColor = '#fff';
             container.style.fontFamily = "'VT323', monospace";
             container.style.color = '#000';
             container.style.position = 'relative';
             container.style.overflow = 'hidden';
 
-            // Watermark Layer (Pattern)
+            // Watermark Layer
             const watermark = document.createElement('div');
             watermark.style.position = 'absolute';
             watermark.style.top = '0';
             watermark.style.left = '0';
             watermark.style.width = '100%';
             watermark.style.height = '100%';
+            // Pastikan path gambar benar. Gunakan base64 jika gambar sering gagal load.
             watermark.style.backgroundImage = "url('ariezona_budget_logo_black.png')";
             watermark.style.backgroundRepeat = 'repeat';
-            watermark.style.backgroundSize = '50px'; // Small repeating pattern
-            watermark.style.opacity = '0.25'; // 25% Overlay
+            watermark.style.backgroundSize = '50px'; 
+            watermark.style.opacity = '0.15'; // Diturunkan sedikit agar teks lebih terbaca
             watermark.style.zIndex = '0';
             container.appendChild(watermark);
 
@@ -1035,9 +1034,9 @@
             content.style.position = 'relative';
             content.style.zIndex = '1';
             content.style.padding = '10px';
-            content.style.textAlign = 'center'; // CENTER EVERYTHING REQUEST
+            content.style.textAlign = 'center'; 
 
-            // Helper to add lines
+            // Helper Functions
             const addLine = (text, isBold = false, fontSize = '16px') => {
                 const p = document.createElement('div');
                 p.innerText = text;
@@ -1053,27 +1052,28 @@
                 content.appendChild(d);
             };
 
-            // Header Logo (100% Overlay)
+            // Header Logo
             const img = document.createElement('img');
             img.src = 'ariezona_budget_logo_black.png';
             img.style.width = '60px';
             img.style.display = 'block';
             img.style.margin = '0 auto 5px auto';
-            img.onerror = function() { this.style.display = 'none'; };
+            // Hindari broken image icon jika gagal load
+            img.onerror = function() { this.style.display = 'none'; }; 
             content.appendChild(img);
 
             addLine("ARIEZONA BUDGET V.3", true, "18px");
             addLine("Original Receipt", false, "12px");
             addDivider();
             
-            // Meta Data (Centered)
+            // Meta Data
             addLine(now.toLocaleDateString('id-ID'));
             addLine(now.toLocaleTimeString('id-ID'));
             addLine("User: " + userName);
             addLine("ID: " + receiptId);
             addDivider();
 
-            // Items (Centered: Name then Value)
+            // Items Helper
             const addSection = (title) => {
                 const d = document.createElement('div');
                 d.innerText = `[ ${title} ]`;
@@ -1091,6 +1091,8 @@
                 content.appendChild(div);
             };
 
+            // --- DATA POPULATION ---
+            
             // Pemasukan
             addSection("PEMASUKAN");
             addItem("Gaji / Income", parseLocaleNumber(document.getElementById('gaji').value));
@@ -1120,6 +1122,7 @@
                 document.querySelectorAll('.savings-flow').forEach(i => addItem(getLabelName(i).replace(':',''), parseLocaleNumber(i.value)));
             }
 
+            // Totals
             addDivider();
             addLine("TOTAL BEBAN", false, "14px");
             addLine(document.getElementById('resTotalKeluar').innerText, true, "18px");
@@ -1137,7 +1140,7 @@
 
             addLine("Status: " + status, true);
             
-            // Random Motivation
+            // Message
             const msgDiv = document.createElement('div');
             msgDiv.innerText = `"${randomMsg}"`;
             msgDiv.style.fontStyle = 'italic';
@@ -1151,29 +1154,36 @@
 
             container.appendChild(content);
 
-            // Append to body temporarily to render
+            // --- PERBAIKAN UTAMA DI SINI ---
+            // Kita append ke body, tapi posisikan FIXED di koordinat 0,0
+            // Namun kita sembunyikan di belakang aplikasi utama menggunakan z-index negatif.
+            // Jangan gunakan left: -9999px.
             document.body.appendChild(container);
-            container.style.position = 'absolute';
-            container.style.left = '-9999px'; // Hide from view but keep in DOM
+            container.style.position = 'fixed';
+            container.style.left = '0';
             container.style.top = '0';
-
+            container.style.zIndex = '-9999'; // Sembunyi di belakang
+            
+            // Render Settings
+            const elementHeight = content.offsetHeight + 60; // Extra buffer
             const opt = {
                 margin:       0,
                 filename:     `Struk_AB_V3_${userName}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
-                jsPDF:        { unit: 'mm', format: [80, 200], orientation: 'portrait' } // Long thermal paper format
+                html2canvas:  { scale: 2, useCORS: true, logging: false },
+                jsPDF:        { unit: 'mm', format: [80, (elementHeight * 0.264583) + 10], orientation: 'portrait' } 
             };
 
-            // Calculate height manually if needed, or let PDF auto page
-            // For simple thermal receipt, we often want one long page.
-            // Using a fixed height for simplicity or we can calculate.
-            const elementHeight = content.offsetHeight + 50; 
-            opt.jsPDF.format = [80, (elementHeight * 0.264583) + 20]; // px to mm
-
-            html2pdf().set(opt).from(container).save().then(() => {
-                document.body.removeChild(container);
-            });
+            // Gunakan setTimeout kecil untuk memastikan DOM sudah dirender browser sebelum dicapture
+            setTimeout(() => {
+                html2pdf().set(opt).from(container).save().then(() => {
+                    // Hapus container setelah selesai download
+                    document.body.removeChild(container);
+                }, (err) => {
+                    console.error("PDF Error:", err);
+                    document.body.removeChild(container);
+                });
+            }, 100);
         }
 
         // --- EXCEL EXPORT (NEAT FORMAT) ---
