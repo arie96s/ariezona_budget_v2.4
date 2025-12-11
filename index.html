@@ -9,7 +9,9 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
     <style>
@@ -88,7 +90,7 @@
             border-bottom: 2px solid #fff;
             border-right: 2px solid #fff;
             box-shadow: inset 2px 2px 0px #000;
-            text-align: left !important; /* REQUEST: Teks ditepi kiri */
+            text-align: left !important;
         }
         
         .search-input::placeholder { color: #808080; }
@@ -992,198 +994,152 @@
             setTimeout(() => { window.print(); }, 500);
         }
 
-        // --- PDF GENERATION (FIXED) ---
+        // --- PDF GENERATION (MENGGUNAKAN PDFMAKE AGAR TIDAK BLANK) ---
         function exportToPDF() {
-            hitung();
+            // 1. Pastikan hitungan terbaru
+            hitung(); 
+
+            // 2. Ambil Data
             const userName = document.getElementById('inputNama').value || 'User';
             const now = new Date();
             const receiptId = "RCP-" + Math.floor(Math.random() * 1000000);
+            
+            // Ambil total dari hasil hitung yang sudah tampil di layar
+            const totalKeluar = document.getElementById('resTotalKeluar').innerText;
+            const sisaCash = document.getElementById('resSisa').innerText;
+            const totalAset = document.getElementById('resTotalAset').innerText;
             const status = document.getElementById('financialStatus').innerText;
+            
+            // Helper untuk format angka
+            const getVal = (id) => document.getElementById(id).value || "0";
+            
+            // 3. Susun Isi Konten (Body PDF)
+            let contentBody = [];
+
+            // --- HEADER ---
+            contentBody.push({ text: 'ARIEZONA BUDGET V.3', style: 'header', alignment: 'center' });
+            contentBody.push({ text: 'FINANCIAL REPORT (STRUK)', style: 'subheader', alignment: 'center' });
+            contentBody.push({ text: '------------------------------------------------', alignment: 'center', margin: [0, 5] });
+
+            // --- INFO ---
+            contentBody.push({
+                columns: [
+                    { text: 'User: ' + userName, width: '*' },
+                    { text: now.toLocaleDateString('id-ID'), width: 'auto', alignment: 'right' }
+                ]
+            });
+            contentBody.push({
+                columns: [
+                    { text: 'ID: ' + receiptId, width: '*' },
+                    { text: now.toLocaleTimeString('id-ID'), width: 'auto', alignment: 'right' }
+                ],
+                margin: [0, 0, 0, 10]
+            });
+
+            // Fungsi Helper untuk menambah baris item
+            function addSection(title, selector, isMinus = false) {
+                let items = [];
+                
+                // Jika manual (Gaji/Saldo)
+                if (title === 'PEMASUKAN') {
+                     items.push(['Gaji / Income', getVal('gaji')]);
+                     items.push(['Saldo Awal', getVal('saldoLalu')]);
+                } 
+                // Jika input dinamis (Hutang/Pengeluaran)
+                else {
+                    document.querySelectorAll(selector).forEach(el => {
+                        let val = parseLocaleNumber(el.value);
+                        if (val > 0) {
+                            let label = getLabelName(el).replace(':', '').trim();
+                            items.push([label, (isMinus ? '-' : '') + formatNumber(val)]);
+                        }
+                    });
+                }
+
+                // Jika ada item, masukkan ke PDF
+                if (items.length > 0) {
+                    contentBody.push({ text: `[ ${title} ]`, style: 'sectionTitle', margin: [0, 10, 0, 2] });
+                    items.forEach(item => {
+                        contentBody.push({
+                            columns: [
+                                { text: item[0], width: '*' },
+                                { text: item[1], width: 'auto', alignment: 'right', bold: true }
+                            ],
+                            margin: [0, 1]
+                        });
+                    });
+                }
+            }
+
+            // 4. Masukkan Section Data
+            addSection('PEMASUKAN', null);
+            addSection('KEWAJIBAN (HUTANG)', '.debt', true);
+            addSection('PENGELUARAN RUTIN', '.expense', true);
+            addSection('TABUNGAN (ASET)', '.savings-flow');
+
+            // --- FOOTER & TOTAL ---
+            contentBody.push({ text: '------------------------------------------------', alignment: 'center', margin: [0, 10] });
+            
+            contentBody.push({
+                columns: [
+                    { text: 'TOTAL BEBAN', width: '*' },
+                    { text: totalKeluar, width: 'auto', alignment: 'right', bold: true }
+                ]
+            });
+             contentBody.push({
+                columns: [
+                    { text: 'SISA CASH', width: '*' },
+                    { text: sisaCash, width: 'auto', alignment: 'right', bold: true }
+                ]
+            });
+
+            // Kotak Total Aset
+            contentBody.push({ canvas: [{ type: 'line', x1: 0, y1: 5, x2: 215, y2: 5, lineWidth: 1 }] });
+            contentBody.push({
+                text: 'TOTAL ASET NET',
+                alignment: 'center',
+                margin: [0, 10, 0, 0],
+                fontSize: 10
+            });
+            contentBody.push({
+                text: totalAset,
+                alignment: 'center',
+                bold: true,
+                fontSize: 16,
+                margin: [0, 0, 0, 10]
+            });
+            
+            contentBody.push({ text: 'Status: ' + status, alignment: 'center', bold: true });
+            
+            // Quote Random
             const statusCode = document.getElementById('financialStatus').getAttribute("data-status-code");
-            const randomMsg = getRandomMessage(statusCode);
+            contentBody.push({ 
+                text: '"' + getRandomMessage(statusCode) + '"', 
+                italics: true, 
+                alignment: 'center', 
+                fontSize: 9, 
+                margin: [0, 15, 0, 0] 
+            });
 
-            // Create a dedicated container element in memory/DOM
-            const container = document.createElement('div');
-            // Set width sedikit lebih besar dari format PDF agar tidak terpotong
-            container.style.width = '79mm'; 
-            container.style.padding = '0';
-            container.style.margin = '0'; // Reset margin
-            container.style.backgroundColor = '#fff';
-            container.style.fontFamily = "'VT323', monospace";
-            container.style.color = '#000';
-            container.style.position = 'relative';
-            container.style.overflow = 'hidden';
-
-            // Watermark Layer
-            const watermark = document.createElement('div');
-            watermark.style.position = 'absolute';
-            watermark.style.top = '0';
-            watermark.style.left = '0';
-            watermark.style.width = '100%';
-            watermark.style.height = '100%';
-            // Pastikan path gambar benar. Gunakan base64 jika gambar sering gagal load.
-            watermark.style.backgroundImage = "url('ariezona_budget_logo_black.png')";
-            watermark.style.backgroundRepeat = 'repeat';
-            watermark.style.backgroundSize = '50px'; 
-            watermark.style.opacity = '0.15'; // Diturunkan sedikit agar teks lebih terbaca
-            watermark.style.zIndex = '0';
-            container.appendChild(watermark);
-
-            // Content Layer
-            const content = document.createElement('div');
-            content.style.position = 'relative';
-            content.style.zIndex = '1';
-            content.style.padding = '10px';
-            content.style.textAlign = 'center'; 
-
-            // Helper Functions
-            const addLine = (text, isBold = false, fontSize = '16px') => {
-                const p = document.createElement('div');
-                p.innerText = text;
-                p.style.fontSize = fontSize;
-                p.style.lineHeight = '1.2';
-                if(isBold) p.style.fontWeight = 'bold';
-                content.appendChild(p);
-            };
-            const addDivider = () => {
-                const d = document.createElement('div');
-                d.style.borderBottom = '1px dashed #000';
-                d.style.margin = '5px 0';
-                content.appendChild(d);
+            // 5. Definisi Dokumen PDF
+            var docDefinition = {
+                // Lebar 80mm (226pt), Tinggi Auto
+                pageSize: { width: 226, height: 'auto' }, 
+                pageMargins: [10, 10, 10, 10], 
+                content: contentBody,
+                styles: {
+                    header: { fontSize: 14, bold: true, margin: [0, 0, 0, 2] },
+                    subheader: { fontSize: 10, bold: false },
+                    sectionTitle: { fontSize: 10, bold: true, decoration: 'underline' }
+                },
+                defaultStyle: {
+                    fontSize: 10,
+                    columnGap: 10
+                }
             };
 
-            // Header Logo
-            const img = document.createElement('img');
-            img.src = 'ariezona_budget_logo_black.png';
-            img.style.width = '60px';
-            img.style.display = 'block';
-            img.style.margin = '0 auto 5px auto';
-            // Hindari broken image icon jika gagal load
-            img.onerror = function() { this.style.display = 'none'; }; 
-            content.appendChild(img);
-
-            addLine("ARIEZONA BUDGET V.3", true, "18px");
-            addLine("Original Receipt", false, "12px");
-            addDivider();
-            
-            // Meta Data
-            addLine(now.toLocaleDateString('id-ID'));
-            addLine(now.toLocaleTimeString('id-ID'));
-            addLine("User: " + userName);
-            addLine("ID: " + receiptId);
-            addDivider();
-
-            // Items Helper
-            const addSection = (title) => {
-                const d = document.createElement('div');
-                d.innerText = `[ ${title} ]`;
-                d.style.fontWeight = 'bold';
-                d.style.marginTop = '10px';
-                d.style.marginBottom = '5px';
-                content.appendChild(d);
-            };
-
-            const addItem = (label, val, isMinus=false) => {
-                if(val <= 0) return;
-                const div = document.createElement('div');
-                div.style.marginBottom = '3px';
-                div.innerHTML = `<div>${label}</div><div style="font-weight:bold">${isMinus?'-':''}${formatNumber(val)}</div>`;
-                content.appendChild(div);
-            };
-
-            // --- DATA POPULATION ---
-            
-            // Pemasukan
-            addSection("PEMASUKAN");
-            addItem("Gaji / Income", parseLocaleNumber(document.getElementById('gaji').value));
-            addItem("Saldo Awal", parseLocaleNumber(document.getElementById('saldoLalu').value));
-
-            // Hutang
-            let hasDebt = false;
-            document.querySelectorAll('.debt').forEach(i => { if(parseLocaleNumber(i.value) > 0) hasDebt = true; });
-            if(hasDebt) {
-                addSection("BAYAR HUTANG");
-                document.querySelectorAll('.debt').forEach(i => addItem(getLabelName(i).replace(':',''), parseLocaleNumber(i.value), true));
-            }
-
-            // Pengeluaran
-            let hasExp = false;
-            document.querySelectorAll('.expense').forEach(i => { if(parseLocaleNumber(i.value) > 0) hasExp = true; });
-            if(hasExp) {
-                addSection("PENGELUARAN");
-                document.querySelectorAll('.expense').forEach(i => addItem(getLabelName(i).replace(':',''), parseLocaleNumber(i.value), true));
-            }
-
-            // Tabungan
-            let hasSave = false;
-            document.querySelectorAll('.savings-flow').forEach(i => { if(parseLocaleNumber(i.value) > 0) hasSave = true; });
-            if(hasSave) {
-                addSection("TABUNGAN");
-                document.querySelectorAll('.savings-flow').forEach(i => addItem(getLabelName(i).replace(':',''), parseLocaleNumber(i.value)));
-            }
-
-            // Totals
-            addDivider();
-            addLine("TOTAL BEBAN", false, "14px");
-            addLine(document.getElementById('resTotalKeluar').innerText, true, "18px");
-            
-            addLine("SISA CASH", false, "14px");
-            addLine(document.getElementById('resSisa').innerText, true, "18px");
-
-            const totalAsetDiv = document.createElement('div');
-            totalAsetDiv.style.border = '2px solid #000';
-            totalAsetDiv.style.padding = '5px';
-            totalAsetDiv.style.marginTop = '10px';
-            totalAsetDiv.style.marginBottom = '10px';
-            totalAsetDiv.innerHTML = `<div style="font-size:12px">TOTAL ASET NET</div><div style="font-size:20px; font-weight:bold">${document.getElementById('resTotalAset').innerText}</div>`;
-            content.appendChild(totalAsetDiv);
-
-            addLine("Status: " + status, true);
-            
-            // Message
-            const msgDiv = document.createElement('div');
-            msgDiv.innerText = `"${randomMsg}"`;
-            msgDiv.style.fontStyle = 'italic';
-            msgDiv.style.marginTop = '15px';
-            msgDiv.style.fontSize = '12px';
-            msgDiv.style.borderTop = '1px dotted #000';
-            msgDiv.style.paddingTop = '5px';
-            content.appendChild(msgDiv);
-
-            addLine("TERIMA KASIH", true, "14px");
-
-            container.appendChild(content);
-
-            // --- PERBAIKAN UTAMA DI SINI ---
-            // Kita append ke body, tapi posisikan FIXED di koordinat 0,0
-            // Namun kita sembunyikan di belakang aplikasi utama menggunakan z-index negatif.
-            // Jangan gunakan left: -9999px.
-            document.body.appendChild(container);
-            container.style.position = 'fixed';
-            container.style.left = '0';
-            container.style.top = '0';
-            container.style.zIndex = '-9999'; // Sembunyi di belakang
-            
-            // Render Settings
-            const elementHeight = content.offsetHeight + 60; // Extra buffer
-            const opt = {
-                margin:       0,
-                filename:     `Struk_AB_V3_${userName}.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, logging: false },
-                jsPDF:        { unit: 'mm', format: [80, (elementHeight * 0.264583) + 10], orientation: 'portrait' } 
-            };
-
-            // Gunakan setTimeout kecil untuk memastikan DOM sudah dirender browser sebelum dicapture
-            setTimeout(() => {
-                html2pdf().set(opt).from(container).save().then(() => {
-                    // Hapus container setelah selesai download
-                    document.body.removeChild(container);
-                }, (err) => {
-                    console.error("PDF Error:", err);
-                    document.body.removeChild(container);
-                });
-            }, 100);
+            // 6. Download PDF
+            pdfMake.createPdf(docDefinition).download(`Struk_AB_${userName}.pdf`);
         }
 
         // --- EXCEL EXPORT (NEAT FORMAT) ---
