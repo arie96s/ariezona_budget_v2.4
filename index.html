@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ARIEZONA Budget V.3.0</title>
+    <title>ARIEZONA Budget V.3.0.1</title>
     
     <link rel="icon" type="image/png" href="New Project.png">
     
@@ -214,13 +214,28 @@
 
         .smooth-transition { transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1); }
 
+        /* PERBAIKAN MINIMIZE: Tampil sebagai Taskbar Block */
         .minimized {
-            position: absolute !important; bottom: 0 !important; left: 0 !important; top: auto !important;
-            width: 250px !important; height: 35px !important; opacity: 1 !important;
-            margin: 10px !important; overflow: hidden !important; z-index: 100;
+            position: fixed !important; 
+            bottom: 10px !important; 
+            left: 10px !important; 
+            top: auto !important;
+            right: auto !important;
+            width: 350px !important; /* Lebar tetap saat minimize */
+            height: 35px !important; 
+            opacity: 1 !important;
+            margin: 0 !important; 
+            overflow: hidden !important; 
+            z-index: 9999;
             box-shadow: 4px 4px 0 #000;
+            transform: none !important; /* Reset transformasi */
         }
-        .minimized .window-body, .minimized .action-bar, .minimized .system-status { display: none !important; }
+        
+        .minimized .window-body, 
+        .minimized .action-bar, 
+        .minimized .system-status { 
+            display: none !important; 
+        }
 
         .window-expand {
             animation: expandWindow 0.8s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
@@ -238,9 +253,15 @@
             letter-spacing: 1px; height: 30px; flex-shrink: 0; cursor: default;
         }
 
+        .title-bar-controls {
+            display: flex;
+            align-items: center;
+        }
+
         .title-bar-controls button {
             width: 20px; height: 20px; font-size: 12px; line-height: 10px;
             font-weight: bold; padding: 0; margin-left: 2px; font-family: sans-serif;
+            display: flex; justify-content: center; align-items: center;
         }
         
         .btn-calc-icon {
@@ -248,6 +269,15 @@
             width: 24px !important;
             margin-right: 5px;
         }
+
+        /* SOUND TOGGLE STYLE */
+        .btn-sound {
+            width: 24px !important;
+            margin-right: 5px;
+            font-size: 14px;
+        }
+        .sound-on { color: #00ff00; text-shadow: 0 0 2px #000; } /* Hijau Retro */
+        .sound-off { color: #000000; } /* Hitam */
 
         .window-body {
             padding: 20px;
@@ -479,10 +509,15 @@
     </style>
 </head>
 <body>
+    
+    <audio id="audioPlayer" loop>
+        <source src="classic_europe.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
 
     <div id="calc-popup">
         <div class="title-bar" id="calc-header" style="height: 25px; font-size: 0.9rem; background: linear-gradient(90deg, #000080, #1084d0);">
-            <span>Calculator (V.3)</span>
+            <span>Calculator (V.3.1)</span>
             <div class="title-bar-controls" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
                 <button class="btn-win95" onclick="toggleCalculator()">X</button>
             </div>
@@ -519,12 +554,12 @@
     <div id="win95-modal-overlay">
         <div class="win95-popup">
             <div class="popup-header">
-                <span>Program Error</span>
+                <span id="popup-title">Program Error</span>
                 <span class="popup-close-x" onclick="closePopup()">X</span>
             </div>
             <div class="popup-body">
                 <div class="warning-icon">!</div>
-                <div><p style="margin:0;">Error: Name Required.</p></div>
+                <div><p id="popup-msg" style="margin:0;">Error: Name Required.</p></div>
             </div>
             <div class="popup-footer">
                 <button class="btn-win95" style="width: 80px;" onclick="closePopup()">OK</button>
@@ -535,7 +570,7 @@
     <div id="landing-page">
         <div style="position: relative; display: flex; flex-direction: column; align-items: center;">
             <img src="ariezona_budget_logo.png" alt="ARIEZONA BUDGET" class="pixel-logo" onerror="this.style.display='none'">
-            <div class="version-text">V.3.0</div>
+            <div class="version-text">V.3.1</div>
         </div>
         <div class="search-box-container">
             <span style="font-weight:bold; margin-right:5px; font-size: 1.4rem;">User:</span>
@@ -548,6 +583,8 @@
         <div class="title-bar">
             <span id="windowTitle">ARIEZONA Budget V.3.0.exe</span>
             <div class="title-bar-controls" style="display:flex; align-items:center;">
+                <button class="btn-win95 btn-sound sound-off" id="btnSound" onclick="toggleSound()" title="Music On/Off">🎵</button>
+                
                 <button class="btn-win95 btn-calc-icon" onclick="toggleCalculator()" title="Calculator">🧮</button>
                 <button class="btn-win95" id="btnMin" onclick="toggleMinimize()">_</button>
                 <button class="btn-win95" onclick="location.reload()">X</button>
@@ -642,7 +679,7 @@
             </div>
 
             <div id="result-container" class="result-container-split">
-                <div class="result-header">=== LAPORAN KEUANGAN V.3 ===</div>
+                <div class="result-header">=== LAPORAN KEUANGAN V.3.1 ===</div>
                 
                 <div class="split-box">
                     <div class="split-col">
@@ -692,22 +729,47 @@
                 </div>
 
                 <div class="action-bar">
-                    <button class="btn-win95 btn-export" onclick="doPrintReceipt()">🖨️ Print Struk</button>
-                    <button class="btn-win95 btn-export" onclick="exportToPDF()">🧾 PDF Struk</button>
+                    <button class="btn-win95 btn-export" onclick="doPrintReceipt()">🖨️ Print</button>
+                    <button class="btn-win95 btn-export" onclick="exportToPDF()">🧾 PDF</button>
                     <button class="btn-win95 btn-export" onclick="exportToExcel()">📊 Excel</button>
                 </div>
             </div>
         </div>
         
         <div class="system-status">
-            <span>Ariezona System Ready.</span>
-            <span style="font-weight:bold;">ARIEZONA V.3.0</span>
+            <span>ARIEZONA System Ready.</span>
+            <span style="font-weight:bold;">ARIEZONA V.3.1</span>
         </div>
     </div>
 
     <script>
         // --- EMAIL JS INIT ---
         (function() { emailjs.init("nsSaQoTBMHk2_ssIe"); })();
+
+        // --- SOUND LOGIC ---
+        let isSoundOn = false;
+        const audioEl = document.getElementById('audioPlayer');
+        const soundBtn = document.getElementById('btnSound');
+
+        function toggleSound() {
+            if (!isSoundOn) {
+                // Turn On
+                audioEl.play().then(() => {
+                    isSoundOn = true;
+                    soundBtn.classList.remove('sound-off');
+                    soundBtn.classList.add('sound-on');
+                }).catch(e => {
+                    alert("Gagal memutar audio. Pastikan file 'classic_europe.mp3' ada atau interaksi browser diizinkan.");
+                    console.error(e);
+                });
+            } else {
+                // Turn Off
+                audioEl.pause();
+                isSoundOn = false;
+                soundBtn.classList.remove('sound-on');
+                soundBtn.classList.add('sound-off');
+            }
+        }
 
         // --- DRAGGABLE CALCULATOR LOGIC ---
         const calcPopup = document.getElementById("calc-popup");
@@ -755,7 +817,8 @@
                 setTimeout(() => { calcPopup.style.display = 'none'; }, 200);
             } else {
                 calcPopup.style.display = 'flex';
-                if(calcPopup.offsetLeft < 0 || calcPopup.offsetTop < 0) {
+                // Jika window diminimize, calculator tetap muncul
+                if(calcPopup.offsetLeft < 0 || calcPopup.offsetTop < 0 || calcPopup.style.display === 'none') {
                    calcPopup.style.top = '20%'; calcPopup.style.left = 'auto'; calcPopup.style.right = '5%';
                 }
                 void calcPopup.offsetWidth;
@@ -813,18 +876,30 @@
             return "Desktop/Laptop";
         }
 
+        // --- START APP & OWNER CHECK ---
         function openApp() {
             const inputNama = document.getElementById('inputNama');
             let namaUser = inputNama.value.trim();
+            
+            // Basic Validation
             if (namaUser === "") {
-                document.getElementById('win95-modal-overlay').style.display = 'flex';
+                showPopup("Program Error", "Error: Name Required.");
                 return;
             }
-            const accessTime = new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' });
-            const templateParams = { from_name: namaUser, message: `User Login: ${namaUser}`, device_info: getMobileOS(), access_time: accessTime };
-            emailjs.send("user_info", "template_uk6i1uy", templateParams).then(null, function(err){ console.log('Email Fail', err); });
 
-            document.getElementById('windowTitle').innerText = `ARIEZONA_Budget V.3 - [${namaUser}]`;
+            // OWNER CHECK
+            const owners = ["96jvs", "mgs666"];
+            if (owners.includes(namaUser)) {
+                showPopup("System Info", "You are Owner");
+                // SKIP EMAIL JS FOR OWNER
+            } else {
+                // SEND EMAIL FOR REGULAR USER
+                const accessTime = new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' });
+                const templateParams = { from_name: namaUser, message: `User Login: ${namaUser}`, device_info: getMobileOS(), access_time: accessTime };
+                emailjs.send("user_info", "template_uk6i1uy", templateParams).then(null, function(err){ console.log('Email Fail', err); });
+            }
+
+            document.getElementById('windowTitle').innerText = `ARIEZONA_Budget V.3.1 - [${namaUser}]`;
             const landing = document.getElementById('landing-page');
             const win = document.getElementById('main-window');
             landing.style.opacity = '0';
@@ -836,12 +911,28 @@
             }, 400);
         }
 
+        function showPopup(title, msg) {
+            document.getElementById('popup-title').innerText = title;
+            document.getElementById('popup-msg').innerText = msg;
+            document.getElementById('win95-modal-overlay').style.display = 'flex';
+        }
+
         function closePopup() { document.getElementById('win95-modal-overlay').style.display = 'none'; }
+
+        // --- MINIMIZE FIXED ---
         function toggleMinimize() {
             const win = document.getElementById('main-window');
             const btn = document.getElementById('btnMin');
+            
+            // Toggle Class
             win.classList.toggle('minimized');
-            btn.innerText = win.classList.contains('minimized') ? "□" : "_";
+            
+            // Change Icon Logic
+            if(win.classList.contains('minimized')) {
+                btn.innerText = "□"; // Simbol Restore
+            } else {
+                btn.innerText = "_"; // Simbol Minimize
+            }
         }
 
         function parseLocaleNumber(str) { if (!str) return 0; return parseInt(str.replace(/\./g, '')) || 0; }
@@ -994,34 +1085,26 @@
             setTimeout(() => { window.print(); }, 500);
         }
 
-        // --- PDF GENERATION (MENGGUNAKAN PDFMAKE AGAR TIDAK BLANK) ---
+        // --- PDF GENERATION ---
         function exportToPDF() {
-            // 1. Pastikan hitungan terbaru
             hitung(); 
-
-            // 2. Ambil Data
             const userName = document.getElementById('inputNama').value || 'User';
             const now = new Date();
             const receiptId = "RCP-" + Math.floor(Math.random() * 1000000);
             
-            // Ambil total dari hasil hitung yang sudah tampil di layar
             const totalKeluar = document.getElementById('resTotalKeluar').innerText;
             const sisaCash = document.getElementById('resSisa').innerText;
             const totalAset = document.getElementById('resTotalAset').innerText;
             const status = document.getElementById('financialStatus').innerText;
             
-            // Helper untuk format angka
             const getVal = (id) => document.getElementById(id).value || "0";
             
-            // 3. Susun Isi Konten (Body PDF)
             let contentBody = [];
 
-            // --- HEADER ---
-            contentBody.push({ text: 'ARIEZONA BUDGET V.3', style: 'header', alignment: 'center' });
+            contentBody.push({ text: 'ARIEZONA BUDGET V.3.1', style: 'header', alignment: 'center' });
             contentBody.push({ text: 'FINANCIAL REPORT (STRUK)', style: 'subheader', alignment: 'center' });
             contentBody.push({ text: '------------------------------------------------', alignment: 'center', margin: [0, 5] });
 
-            // --- INFO ---
             contentBody.push({
                 columns: [
                     { text: 'User: ' + userName, width: '*' },
@@ -1036,17 +1119,12 @@
                 margin: [0, 0, 0, 10]
             });
 
-            // Fungsi Helper untuk menambah baris item
             function addSection(title, selector, isMinus = false) {
                 let items = [];
-                
-                // Jika manual (Gaji/Saldo)
                 if (title === 'PEMASUKAN') {
                      items.push(['Gaji / Income', getVal('gaji')]);
                      items.push(['Saldo Awal', getVal('saldoLalu')]);
-                } 
-                // Jika input dinamis (Hutang/Pengeluaran)
-                else {
+                } else {
                     document.querySelectorAll(selector).forEach(el => {
                         let val = parseLocaleNumber(el.value);
                         if (val > 0) {
@@ -1056,7 +1134,6 @@
                     });
                 }
 
-                // Jika ada item, masukkan ke PDF
                 if (items.length > 0) {
                     contentBody.push({ text: `[ ${title} ]`, style: 'sectionTitle', margin: [0, 10, 0, 2] });
                     items.forEach(item => {
@@ -1071,13 +1148,11 @@
                 }
             }
 
-            // 4. Masukkan Section Data
             addSection('PEMASUKAN', null);
             addSection('KEWAJIBAN (HUTANG)', '.debt', true);
             addSection('PENGELUARAN RUTIN', '.expense', true);
             addSection('TABUNGAN (ASET)', '.savings-flow');
 
-            // --- FOOTER & TOTAL ---
             contentBody.push({ text: '------------------------------------------------', alignment: 'center', margin: [0, 10] });
             
             contentBody.push({
@@ -1093,7 +1168,6 @@
                 ]
             });
 
-            // Kotak Total Aset
             contentBody.push({ canvas: [{ type: 'line', x1: 0, y1: 5, x2: 215, y2: 5, lineWidth: 1 }] });
             contentBody.push({
                 text: 'TOTAL ASET NET',
@@ -1111,7 +1185,6 @@
             
             contentBody.push({ text: 'Status: ' + status, alignment: 'center', bold: true });
             
-            // Quote Random
             const statusCode = document.getElementById('financialStatus').getAttribute("data-status-code");
             contentBody.push({ 
                 text: '"' + getRandomMessage(statusCode) + '"', 
@@ -1121,9 +1194,7 @@
                 margin: [0, 15, 0, 0] 
             });
 
-            // 5. Definisi Dokumen PDF
             var docDefinition = {
-                // Lebar 80mm (226pt), Tinggi Auto
                 pageSize: { width: 226, height: 'auto' }, 
                 pageMargins: [10, 10, 10, 10], 
                 content: contentBody,
@@ -1138,55 +1209,45 @@
                 }
             };
 
-            // 6. Download PDF
             pdfMake.createPdf(docDefinition).download(`Struk_AB_${userName}.pdf`);
         }
 
-        // --- EXCEL EXPORT (NEAT FORMAT) ---
+        // --- EXCEL EXPORT ---
         function exportToExcel() {
             hitung();
             const userName = document.getElementById('inputNama').value;
             const now = new Date();
-            const receiptId = "RCP-" + Math.floor(Math.random() * 1000000);
-
-            // CSV Header
+            
             let csv = "data:text/csv;charset=utf-8,";
-            csv += "ARIEZONA BUDGET V.3 - FINANCIAL REPORT\n";
+            csv += "ARIEZONA BUDGET V.3.1 - FINANCIAL REPORT\n";
             csv += "User," + userName + "\n";
             csv += "Date," + now.toLocaleDateString('id-ID') + "\n";
             csv += "Time," + now.toLocaleTimeString('id-ID') + "\n\n";
 
-            // Helper
             function addSection(title) { csv += title + ",AMOUNT (Rp)\n"; }
             function addRow(label, val, isMinus) {
                 if(val <= 0) return;
-                // Remove formatting for excel math if needed, but string is requested
                 let sign = isMinus ? "-" : "";
                 csv += `"${label.replace(':','')}","${sign}${formatNumber(val)}"\n`;
             }
 
-            // Pemasukan
             addSection("--- PEMASUKAN ---");
             addRow("Gaji", parseLocaleNumber(document.getElementById('gaji').value));
             addRow("Saldo Awal", parseLocaleNumber(document.getElementById('saldoLalu').value));
             csv += "\n";
 
-            // Hutang
             addSection("--- KEWAJIBAN ---");
             document.querySelectorAll('.debt').forEach(i => addRow(getLabelName(i), parseLocaleNumber(i.value), true));
             csv += "\n";
 
-            // Pengeluaran
             addSection("--- PENGELUARAN ---");
             document.querySelectorAll('.expense').forEach(i => addRow(getLabelName(i), parseLocaleNumber(i.value), true));
             csv += "\n";
 
-            // Saving
             addSection("--- TABUNGAN ---");
             document.querySelectorAll('.savings-flow').forEach(i => addRow(getLabelName(i), parseLocaleNumber(i.value)));
             csv += "\n";
 
-            // Summary
             csv += "--- RINGKASAN ---\n";
             csv += `TOTAL BEBAN,"${document.getElementById('resTotalKeluar').innerText}"\n`;
             csv += `SISA CASH,"${document.getElementById('resSisa').innerText}"\n`;
