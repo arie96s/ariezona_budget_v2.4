@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ARIEZONA Budget V.3.1 (APK Edition)</title>
+    
+    <link rel="icon" type="image/png" href="New Project.png">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+    <style>
+        :root {
+            --win-bg: #c0c0c0;
+            --win-blue: #000080;
+            --win-gray-dark: #808080;
+            --win-light: #ffffff;
+            --desktop: #008080;
+            --font-pixel-header: 'Press Start 2P', cursive;
+            --font-pixel-text: 'VT323', monospace;
+        }
+
+        /* --- APK OPTIMIZATION CSS --- */
+        body {
+            background-color: var(--desktop);
+            font-family: var(--font-pixel-text); 
+            font-size: 1.3rem;
+            margin: 0;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            
+            /* FIX ANDROID: Mencegah pull-to-refresh & zoom */
+            overscroll-behavior-y: none;
+            touch-action: pan-x pan-y;
+            -webkit-text-size-adjust: 100%;
+            -webkit-font-smoothing: none;
+        }
+
+        /* FIX INPUT ZOOM */
+        input[type="text"] { font-size: 1.3rem !important; }
+
+        /* --- BOOT SCREEN (LOADING) STYLES --- */
+        #boot-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--desktop);
+            z-index: 99999; 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: var(--font-pixel-text);
+        }
+
+        .boot-window {
+            display: flex;
+            flex-direction: column;
+            align-items: center; 
+            width: 100%;
+        }
+
+        .boot-logo {
+            width: 160px; /* Logo lebih besar */
+            height: auto;
+            image-rendering: pixelated;
+            margin-bottom: 15px;
+            filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.5));
+        }
+
+        .boot-text {
+            color: white;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 0 #000;
+            letter-spacing: 2px;
+            margin-top: 10px;
+        }
+
+        /* PROGRESS BAR WIN 95 STYLE */
+        .progress-box {
+            width: 130px; /* Loading bar lebih kecil dari logo (160px) */
+            height: 20px;
+            background: #c0c0c0;
+            border-top: 2px solid #808080;
+            border-left: 2px solid #808080;
+            border-bottom: 2px solid #fff;
+            border-right: 2px solid #fff;
+            padding: 2px;
+            box-shadow: 4px 4px 0 #000;
+            display: flex;
+            align-items: center;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: transparent;
+            /* Trik CSS: Membuat kotak-kotak biru terpisah khas Win95 */
+            background-image: linear-gradient(90deg, #000080 0%, #000080 80%, transparent 80%, transparent 100%);
+            background-size: 12px 100%; 
+        }
+
+        .boot-footer {
+            margin-top: 15px;
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+
+        /* --- LANDING SEARCH PAGE --- */
+        #landing-page {
+            text-align: center;
+            transition: all 0.5s ease;
+            z-index: 10;
+            display: flex; /* Awalnya flex, tapi tertutup boot screen */
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            opacity: 0; /* Sembunyikan dulu sampai loading selesai */
+            transform: scale(0.95);
+        }
+        
+        /* Kelas untuk memunculkan landing page */
+        .show-landing {
+            opacity: 1 !important;
+            transform: scale(1) !important;
+        }
+
+        .pixel-logo {
+            max-width: 80%;
+            height: auto;
+            filter: drop-shadow(6px 6px 0px #000000); 
+            image-rendering: pixelated;
+            margin-bottom: 5px;
+        }
+
+        .version-text {
+            font-family: var(--font-pixel-header);
+            color: white;
+            font-size: 12px;
+            text-shadow: 2px 2px #000;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+
+        .search-box-container {
+            background: #c0c0c0;
+            padding: 10px;
+            border: 2px solid #fff;
+            box-shadow: 4px 4px 0 #000;
+            display: inline-block;
+        }
+
+        .search-input {
+            width: 300px;
+            padding: 5px;
+            font-family: var(--font-pixel-text);
+            font-size: 1.4rem;
+            background: #fff;
+            color: #000;
+            cursor: text;
+            border: 2px solid #808080;
+            border-bottom: 2px solid #fff;
+            border-right: 2px solid #fff;
+            box-shadow: inset 2px 2px 0px #000;
+            text-align: left !important;
+        }
+        
+        .search-input::placeholder { color: #808080; }
+
+        .btn-win95 {
+            background: #c0c0c0;
+            border-top: 2px solid #fff;
+            border-left: 2px solid #fff;
+            border-bottom: 2px solid #000;
+            border-right: 2px solid #000;
+            padding: 5px 15px;
+            cursor: pointer;
+            margin-left: 5px;
+            font-family: var(--font-pixel-header);
+            font-size: 10px;
+            color: black;
+            outline: none;
+            box-shadow: 2px 2px 0px #000;
+        }
+
+        .btn-win95:active {
+            border-top: 2px solid #000;
+            border-left: 2px solid #000;
+            border-bottom: 2px solid #fff;
+            border-right: 2px solid #fff;
+            transform: translate(2px, 2px);
+            box-shadow: none;
+        }
+
+        .btn-small-add {
+            font-family: var(--font-pixel-text);
+            font-size: 1rem;
+            padding: 2px 8px;
+            margin-top: 5px;
+            background: #008080;
+            color: white;
+            border: 2px solid #fff;
+            box-shadow: 2px 2px 0 #000;
+            cursor: pointer;
+        }
+        .btn-small-add:hover { background: #006060; }
+        .btn-small-add:disabled { background: #808080; cursor: not-allowed; }
+
+        /* --- MODAL --- */
+        #win95-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.1);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .win95-popup {
+            background: var(--win-bg);
+            border: 2px solid #fff;
+            border-right: 2px solid #000;
+            border-bottom: 2px solid #000;
+            box-shadow: 4px 4px 0px rgba(0,0,0,1);
+            width: 300px;
+            padding: 2px;
+            display: flex;
+            flex-direction: column;
+            font-family: var(--font-pixel-text);
+        }
+
+        .popup-header {
+            background: var(--win-blue);
+            color: white;
+            padding: 2px 5px;
+            font-size: 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .popup-close-x {
+            background: #c0c0c0;
+            color: black;
+            border: 1px solid #fff;
+            border-right: 1px solid #000;
+            border-bottom: 1px solid #000;
+            width: 20px;
+            height: 18px;
+            line-height: 16px;
+            text-align: center;
+            font-size: 14px;
+            cursor: pointer;
+            font-family: sans-serif;
+            font-weight: bold;
+        }
+
+        .popup-body { padding: 15px; display: flex; align-items: center; gap: 15px; }
+        .warning-icon {
+            width: 32px; height: 32px; background: #ffff00; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 24px; font-weight: bold; border: 2px solid #000; font-family: serif;
+        }
+        .popup-footer { display: flex; justify-content: center; padding-bottom: 15px; }
+
+        /* --- MAIN WINDOW --- */
+        #main-window {
+            display: none;
+            width: 0; height: 0; opacity: 0;
+            background: var(--win-bg);
+            border: 2px solid #fff;
+            box-shadow: 6px 6px 0 #000;
+            position: relative; 
+            flex-direction: column;
+            overflow: hidden;
+            border-right: 2px solid #000;
+            border-bottom: 2px solid #000;
+            transform-origin: bottom left;
+            max-height: 92vh; 
+            z-index: 50;
+        }
+
+        .smooth-transition { transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1); }
+
+        .minimized {
+            position: fixed !important; 
+            bottom: 10px !important; 
+            left: 10px !important; 
+            top: auto !important;
+            right: auto !important;
+            width: 350px !important; 
+            height: 35px !important; 
+            opacity: 1 !important;
+            margin: 0 !important; 
+            overflow: hidden !important; 
+            z-index: 9999;
+            box-shadow: 4px 4px 0 #000;
+            transform: none !important; 
+        }
+        
+        .minimized .window-body, 
+        .minimized .action-bar, 
+        .minimized .system-status { 
+            display: none !important; 
+        }
+
+        .window-expand {
+            animation: expandWindow 0.8s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+        }
+        @keyframes expandWindow {
+            0% { width: 100px; height: 50px; opacity: 0; }
+            100% { width: 95%; max-width: 900px; height: 90vh; opacity: 1; }
+        }
+
+        .title-bar {
+            background: linear-gradient(90deg, var(--win-blue), #1084d0);
+            padding: 4px 8px;
+            display: flex; justify-content: space-between; align-items: center;
+            color: white; font-family: var(--font-pixel-text); font-size: 1.2rem;
+            letter-spacing: 1px; height: 30px; flex-shrink: 0; cursor: default;
+        }
+
+        .title-bar-controls {
+            display: flex;
+            align-items: center;
+        }
+
+        .title-bar-controls button {
+            width: 20px; height: 20px; font-size: 12px; line-height: 10px;
+            font-weight: bold; padding: 0; margin-left: 2px; font-family: sans-serif;
+            display: flex; justify-content: center; align-items: center;
+        }
+        
+        .btn-calc-icon {
+            font-size: 14px !important; 
+            width: 24px !important;
+            margin-right: 5px;
+        }
+
+        .btn-sound {
+            width: 24px !important;
+            margin-right: 5px;
+            font-size: 14px;
+        }
+        .sound-on { color: #00ff00; text-shadow: 0 0 2px #000; } 
+        .sound-off { color: #000000; } 
+
+        .window-body {
+            padding: 20px;
+            padding-bottom: 30px; 
+            overflow-y: auto;
+            flex: 1; 
+            scrollbar-width: thin;
+            scrollbar-color: #808080 #c0c0c0;
+            touch-action: pan-y;
+        }
+        
+        /* --- FORM STYLES --- */
+        fieldset {
+            border: 2px solid #808080;
+            border-bottom: 2px solid #fff;
+            border-right: 2px solid #fff;
+            margin-bottom: 25px; 
+            padding: 25px 15px 15px 15px; 
+            box-shadow: -1px -1px 0 #000;
+            position: relative;
+            background: transparent;
+        }
+
+        legend {
+            padding: 3px 10px;
+            font-family: var(--font-pixel-text);
+            font-size: 1.4rem;
+            color: #000080;
+            font-weight: bold; 
+            background-color: var(--win-bg); 
+            border: 1px solid #fff;
+            border-right: 1px solid #808080;
+            border-bottom: 1px solid #808080;
+            box-shadow: 1px 1px 0 #000;
+            margin-left: 10px;
+            transform: translateY(-5px);
+        }
+
+        .form-row {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 10px; gap: 10px;
+        }
+
+        label { font-size: 1.3rem; }
+
+        input[type="text"] {
+            font-family: var(--font-pixel-text); font-size: 1.3rem; text-align: right;
+            padding: 2px 5px; border: 2px solid #808080; border-bottom: 2px solid #fff;
+            border-right: 2px solid #fff; box-shadow: inset 2px 2px 0px #000;
+            width: 150px; background: #fff;
+        }
+        
+        .custom-label-input {
+            text-align: left !important; width: 140px !important; border: none !important;
+            background: transparent !important; box-shadow: none !important;
+            border-bottom: 1px dashed #808080 !important; padding: 0 !important;
+            font-family: var(--font-pixel-text); font-size: 1.3rem; color: #000080;
+        }
+        .custom-label-input:focus {
+            outline: none; border-bottom: 1px solid #000 !important; background: #fff !important;
+        }
+
+        /* --- RESULT LAYOUT --- */
+        .result-container-split {
+            display: none; margin-top: 20px; border-top: 2px dashed #000;
+            padding-top: 20px; padding-bottom: 10px; 
+        }
+
+        .result-header {
+            text-align: center; background: #000080; color: white;
+            font-family: var(--font-pixel-text); font-size: 1.4rem;
+            letter-spacing: 2px; padding: 5px; margin-bottom: 10px;
+            box-shadow: 2px 2px 0 #000;
+        }
+
+        .split-box { display: flex; gap: 15px; flex-wrap: wrap; }
+        .split-col {
+            flex: 1; min-width: 280px; background: #fff;
+            border: 2px solid #808080; border-bottom: 2px solid #fff;
+            border-right: 2px solid #fff; box-shadow: inset 2px 2px 0 #000;
+            padding: 10px; font-family: var(--font-pixel-text); font-size: 1.3rem;
+        }
+
+        .col-title {
+            text-align: center; border-bottom: 2px dashed #000; padding-bottom: 5px;
+            margin-bottom: 10px; text-transform: uppercase; font-weight: bold;
+        }
+
+        .res-row { display: flex; justify-content: space-between; border-bottom: 1px dotted #ccc; padding: 5px 0; }
+        .res-subtotal { background-color: #f0f0f0; border-top: 2px solid #000; margin-top: 5px; font-weight: bold; }
+
+        .res-grand-total {
+            margin-top: 15px; padding: 10px; background: #e0e0e0;
+            border: 2px solid #fff; border-right: 2px solid #000;
+            border-bottom: 2px solid #000; box-shadow: 2px 2px 0 #808080;
+            text-align: center; font-size: 1.5em;
+        }
+
+        .green-text { color: #008000; }
+        .red-text { color: #d00000; }
+        .blue-text { color: #000080; }
+
+        .action-bar {
+            display: flex; justify-content: space-between; margin-top: 15px;
+            gap: 10px; flex-wrap: wrap; padding-bottom: 5px;
+        }
+        .btn-calc { flex: 2; padding: 10px; background: #ffff00; font-size: 14px; }
+        .btn-export { flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        
+        .system-status {
+            border-top: 2px solid #808080; padding: 4px 8px; font-size: 1rem; 
+            display: flex; justify-content: space-between; background: var(--win-bg);
+            flex-shrink: 0; font-family: var(--font-pixel-text); color: #333;
+        }
+
+        /* --- CALCULATOR POPUP --- */
+        #calc-popup {
+            position: fixed; 
+            top: 20%;
+            right: 5%; 
+            width: 240px;
+            background: var(--win-bg);
+            border: 2px solid #fff;
+            border-right: 2px solid #000;
+            border-bottom: 2px solid #000;
+            box-shadow: 6px 6px 15px rgba(0,0,0,0.6);
+            display: none;
+            flex-direction: column;
+            z-index: 9999;
+            opacity: 0;
+            transform: scale(0.9);
+            transition: opacity 0.2s, transform 0.2s; 
+        }
+
+        #calc-popup.show-calc {
+            display: flex;
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        #calc-header {
+            cursor: move; 
+            user-select: none;
+            touch-action: none;
+        }
+
+        .calc-screen {
+            background: #fff;
+            border: 2px solid #808080;
+            border-bottom: 2px solid #fff;
+            border-right: 2px solid #fff;
+            margin: 10px;
+            padding: 5px;
+            text-align: right;
+            font-family: 'VT323', monospace;
+            font-size: 1.8rem;
+            color: #000;
+            height: 35px;
+            box-shadow: inset 2px 2px 0 #000;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .calc-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+            padding: 0 10px 15px 10px;
+        }
+
+        .btn-cal-key {
+            height: 40px;
+            font-family: 'VT323', monospace;
+            font-size: 1.4rem;
+            background: #c0c0c0;
+            border-top: 1px solid #fff;
+            border-left: 1px solid #fff;
+            border-bottom: 1px solid #000;
+            border-right: 1px solid #000;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        .btn-cal-key:active {
+            border-top: 1px solid #000;
+            border-left: 1px solid #000;
+            border-bottom: 1px solid #fff;
+            border-right: 1px solid #fff;
+            transform: translate(1px, 1px);
+        }
+        .cal-red { color: darkred; font-weight: bold; }
+        .cal-blue { color: darkblue; font-weight: bold; }
+
+        /* --- PRINT STRUK (A4) --- */
+        #print-only-container {
+            display: none;
+        }
+
+        @media print {
+            body { 
+                background: white; 
+                height: auto; 
+                display: block; 
+                overflow: visible; 
+            }
+            #landing-page, #win95-modal-overlay, #main-window, #calc-popup, #boot-screen { 
+                display: none !important; 
+            }
+            #print-only-container {
+                display: block !important;
+                width: 100%;
+                max-width: 210mm; /* A4 Width */
+                margin: 0 auto;
+                font-family: 'VT323', monospace;
+                color: #000;
+                padding: 20px;
+                box-sizing: border-box;
+            }
+            .print-header { text-align: center; margin-bottom: 20px; border-bottom: 3px double #000; padding-bottom: 10px; }
+            .print-logo { width: 100px; height: auto; display: block; margin: 0 auto; }
+            .print-title { font-size: 24px; font-weight: bold; margin-top: 10px; }
+            .print-info { display: flex; justify-content: space-between; border-bottom: 1px solid #000; margin-bottom: 15px; padding-bottom: 5px; }
+            .print-section { margin-top: 15px; }
+            .print-section-title { font-weight: bold; text-decoration: underline; font-size: 18px; margin-bottom: 5px; }
+            .print-row { display: flex; justify-content: space-between; margin-bottom: 3px; font-size: 16px; }
+            .print-total-box { border: 2px solid #000; padding: 10px; margin-top: 20px; text-align: right; }
+            .print-total-row { font-size: 20px; font-weight: bold; margin-bottom: 5px; }
+            .print-footer { text-align: center; margin-top: 30px; font-style: italic; font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+    
+    <div id="boot-screen">
+        <div class="boot-window">
+            <img src="New Project.png" alt="Loading" class="boot-logo" onerror="this.src='ariezona_budget_logo.png'">
+            <div class="boot-text">INITIALIZING...</div>
+            
+            <div class="progress-box">
+                <div class="progress-bar" id="boot-bar"></div>
+            </div>
+            
+            <div class="boot-footer">ARIEZONA SYSTEM V.3.1</div>
+        </div>
+    </div>
+
+    <audio id="audioPlayer" loop>
+        <source src="classic_europe.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <div id="calc-popup">
+        <div class="title-bar" id="calc-header" style="height: 25px; font-size: 0.9rem; background: linear-gradient(90deg, #000080, #1084d0);">
+            <span>Calculator (V.3.1)</span>
+            <div class="title-bar-controls" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">
+                <button class="btn-win95" onclick="toggleCalculator()">X</button>
+            </div>
+        </div>
+        <div class="calc-screen" id="calcDisplay">0</div>
+        <div class="calc-buttons">
+            <button class="btn-cal-key cal-red" onclick="clearCalc()">C</button>
+            <button class="btn-cal-key" onclick="appendCalc('/')">/</button>
+            <button class="btn-cal-key" onclick="appendCalc('*')">x</button>
+            <button class="btn-cal-key" onclick="deleteCalcChar()">←</button>
+
+            <button class="btn-cal-key" onclick="appendCalc('7')">7</button>
+            <button class="btn-cal-key" onclick="appendCalc('8')">8</button>
+            <button class="btn-cal-key" onclick="appendCalc('9')">9</button>
+            <button class="btn-cal-key" onclick="appendCalc('-')">-</button>
+
+            <button class="btn-cal-key" onclick="appendCalc('4')">4</button>
+            <button class="btn-cal-key" onclick="appendCalc('5')">5</button>
+            <button class="btn-cal-key" onclick="appendCalc('6')">6</button>
+            <button class="btn-cal-key" onclick="appendCalc('+')">+</button>
+
+            <button class="btn-cal-key" onclick="appendCalc('1')">1</button>
+            <button class="btn-cal-key" onclick="appendCalc('2')">2</button>
+            <button class="btn-cal-key" onclick="appendCalc('3')">3</button>
+            <button class="btn-cal-key cal-blue" style="grid-row: span 2; height: 100%;" onclick="calculateResult()">=</button>
+
+            <button class="btn-cal-key" onclick="appendCalc('0')" style="grid-column: span 2; width: 100%;">0</button>
+            <button class="btn-cal-key" onclick="appendCalc('.')">.</button>
+        </div>
+    </div>
+
+    <div id="print-only-container"></div>
+
+    <div id="win95-modal-overlay">
+        <div class="win95-popup">
+            <div class="popup-header">
+                <span id="popup-title">Program Error</span>
+                <span class="popup-close-x" onclick="closePopup()">X</span>
+            </div>
+            <div class="popup-body">
+                <div class="warning-icon">!</div>
+                <div><p id="popup-msg" style="margin:0;">Error: Name Required.</p></div>
+            </div>
+            <div class="popup-footer">
+                <button class="btn-win95" style="width: 80px;" onclick="closePopup()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="landing-page">
+        <div style="position: relative; display: flex; flex-direction: column; align-items: center;">
+            <img src="ariezona_budget_logo.png" alt="ARIEZONA BUDGET" class="pixel-logo" onerror="this.style.display='none'">
+            <div class="version-text">V.3.1 - APK Edition</div>
+        </div>
+        <div class="search-box-container">
+            <span style="font-weight:bold; margin-right:5px; font-size: 1.4rem;">User:</span>
+            <input type="text" id="inputNama" placeholder="Isi Nama Kamu ..." class="search-input">
+            <button class="btn-win95" onclick="openApp()">START</button>
+        </div>
+    </div>
+
+    <div id="main-window">
+        <div class="title-bar">
+            <span id="windowTitle">ARIEZONA Budget V.3.1.exe</span>
+            <div class="title-bar-controls" style="display:flex; align-items:center;">
+                <button class="btn-win95 btn-sound sound-off" id="btnSound" onclick="toggleSound()" title="Music On/Off">🎵</button>
+                
+                <button class="btn-win95 btn-calc-icon" onclick="toggleCalculator()" title="Calculator">🧮</button>
+                <button class="btn-win95" id="btnMin" onclick="toggleMinimize()">_</button>
+                
+                <button class="btn-win95" onclick="resetAndReload()" title="Reset Data & Reload">X</button>
+            </div>
+        </div>
+
+        <div class="window-body" id="print-area">
+            
+            <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+                <div style="flex:1; min-width: 300px;">
+                    <fieldset>
+                        <legend>1. Pemasukan & Saldo</legend>
+                        <div class="form-row">
+                            <label>Gaji Bulan Ini:</label>
+                            <input type="text" id="gaji" class="money-input income-group" placeholder="0">
+                        </div>
+                        <div class="form-row">
+                            <label>Simpanan Lalu:</label>
+                            <input type="text" id="saldoLalu" class="money-input income-group" placeholder="0">
+                        </div>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>2. Kewajiban & Hutang</legend>
+                        <div class="form-row">
+                            <label>Cicilan:</label>
+                            <input type="text" class="money-input debt" placeholder="0">
+                        </div>
+                        <div class="form-row">
+                            <label>Pinjaman Online/Bank:</label>
+                            <input type="text" class="money-input debt" placeholder="0">
+                        </div>
+                        <div class="form-row">
+                            <label>Hutang Teman/Kasbon:</label>
+                            <input type="text" class="money-input debt" placeholder="0">
+                        </div>
+                    </fieldset>
+                </div>
+
+                <div style="flex:1; min-width: 300px;">
+                    <fieldset id="fieldset-pengeluaran">
+                        <legend>3. Pengeluaran Rutin</legend>
+                        <div class="form-row">
+                            <label>Uang Kost/Sewa:</label>
+                            <input type="text" class="money-input expense" placeholder="0">
+                        </div>
+                        <div class="form-row">
+                            <label>Kirim Orang Tua:</label>
+                            <input type="text" class="money-input expense" placeholder="0">
+                        </div>
+                        <div class="form-row">
+                            <label>Makan & Minum:</label>
+                            <input type="text" class="money-input expense" placeholder="0">
+                        </div>
+                        <div class="form-row">
+                            <label>Data/Listrik/Air:</label>
+                            <input type="text" class="money-input expense" placeholder="0">
+                        </div>
+                        <div class="form-row">
+                            <label>Transportasi:</label>
+                            <input type="text" class="money-input expense" placeholder="0">
+                        </div>
+                        
+                        <div id="custom-expenses-container">
+                             <div class="form-row">
+                                <input type="text" class="custom-label-input" value="Lain-lain" placeholder="Nama Pengeluaran">
+                                <input type="text" class="money-input expense" placeholder="0">
+                            </div>
+                        </div>
+
+                        <div style="text-align: right;">
+                            <button type="button" id="btnAddRow" class="btn-small-add" onclick="addCustomRow()">+ Tambah</button>
+                        </div>
+                    </fieldset>
+                    
+                    <fieldset>
+                        <legend>4. Tabungan (Aset)</legend>
+                        <div class="form-row">
+                            <label>Investasi/Saham:</label>
+                            <input type="text" class="money-input savings-flow" placeholder="0">
+                        </div>
+                        <div class="form-row">
+                            <label>Tabungan Cash:</label>
+                            <input type="text" class="money-input savings-flow" placeholder="0">
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+
+            <div class="action-bar">
+                <button class="btn-win95 btn-calc" onclick="hitung()">HITUNG SEMUA</button>
+            </div>
+
+            <div id="result-container" class="result-container-split">
+                <div class="result-header">=== LAPORAN KEUANGAN V.3.1 ===</div>
+                
+                <div class="split-box">
+                    <div class="split-col">
+                        <div class="col-title red-text">BEBAN & PENGELUARAN</div>
+                        <div class="res-row">
+                            <span>Total Pengeluaran Rutin:</span>
+                            <span id="resRutin">Rp 0</span>
+                        </div>
+                        <div class="res-row">
+                            <span>Total Bayar Hutang:</span>
+                            <span id="resHutang">Rp 0</span>
+                        </div>
+                        <br>
+                        <div class="res-row res-subtotal red-text">
+                            <span>TOTAL UANG KELUAR:</span>
+                            <span id="resTotalKeluar">Rp 0</span>
+                        </div>
+                        <div style="font-size:1rem; margin-top:5px; font-style:italic;">*Hangus dipakai kebutuhan/utang.</div>
+                    </div>
+
+                    <div class="split-col">
+                        <div class="col-title green-text">PEMASUKAN & ASET</div>
+                        <div class="res-row">
+                            <span>Pemasukan (Gaji):</span>
+                            <span id="resGaji" class="blue-text">Rp 0</span>
+                        </div>
+                        <div class="res-row">
+                            <span>Penambahan Tabungan:</span>
+                            <span id="resNabung">Rp 0</span>
+                        </div>
+                        <div class="res-row">
+                            <span>Sisa Uang (Cash):</span>
+                            <span id="resSisa">Rp 0</span>
+                        </div>
+                        <br>
+                        <div class="res-row res-subtotal green-text">
+                            <span>TOTAL ASET (NET):</span>
+                            <span id="resTotalAset">Rp 0</span>
+                        </div>
+                        <div style="font-size:1rem; margin-top:5px; font-style:italic;">*Saldo Lama + Tabungan + Sisa Cash.</div>
+                    </div>
+                </div>
+
+                <div class="res-grand-total">
+                    <div style="font-size: 0.8em; margin-bottom: 5px;">STATUS KEUANGAN:</div>
+                    <span id="financialStatus" style="font-weight:bold;">-</span>
+                </div>
+
+                <div class="action-bar">
+                    <button class="btn-win95 btn-export" onclick="doPrintReceipt()">🖨️ Print</button>
+                    <button class="btn-win95 btn-export" onclick="exportToPDF()">🧾 PDF</button>
+                    <button class="btn-win95 btn-export" onclick="exportToExcel()">📊 Excel</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="system-status">
+            <span>ARIEZONA System Ready.</span>
+            <span style="font-weight:bold;">ARIEZONA V.3.1</span>
+        </div>
+    </div>
+
+    <script>
+        // --- BOOT SCREEN LOGIC ---
+        window.addEventListener('load', function() {
+            const bar = document.getElementById('boot-bar');
+            const screen = document.getElementById('boot-screen');
+            const landing = document.getElementById('landing-page');
+            
+            let width = 0;
+            // Interval 50ms untuk durasi sekitar 2.5 - 3 detik
+            const interval = setInterval(() => {
+                width += Math.floor(Math.random() * 4) + 1; // Increment random 1-4%
+                
+                if(width > 100) width = 100;
+                bar.style.width = width + '%';
+                
+                if(width >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        screen.style.display = 'none';
+                        landing.classList.add('show-landing'); 
+                        loadFromMemory();
+                    }, 500); 
+                }
+            }, 50); 
+        });
+
+        // --- EMAIL JS INIT ---
+        (function() { emailjs.init("nsSaQoTBMHk2_ssIe"); })();
+
+        // --- SOUND LOGIC ---
+        let isSoundOn = false;
+        const audioEl = document.getElementById('audioPlayer');
+        const soundBtn = document.getElementById('btnSound');
+
+        function toggleSound() {
+            if (!isSoundOn) {
+                audioEl.play().then(() => {
+                    isSoundOn = true;
+                    soundBtn.classList.remove('sound-off');
+                    soundBtn.classList.add('sound-on');
+                }).catch(e => {
+                    alert("Gagal memutar audio. Pastikan file 'classic_europe.mp3' ada.");
+                    console.error(e);
+                });
+            } else {
+                audioEl.pause();
+                isSoundOn = false;
+                soundBtn.classList.remove('sound-on');
+                soundBtn.classList.add('sound-off');
+            }
+        }
+
+        // --- DRAGGABLE CALCULATOR LOGIC ---
+        const calcPopup = document.getElementById("calc-popup");
+        const calcHeader = document.getElementById("calc-header");
+
+        function dragElement(elmnt) {
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            const header = document.getElementById(elmnt.id + "-header") || elmnt;
+            header.onmousedown = dragMouseDown;
+            header.ontouchstart = dragMouseDown;
+            function dragMouseDown(e) {
+                e = e || window.event;
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                pos3 = clientX;
+                pos4 = clientY;
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
+                document.ontouchend = closeDragElement;
+                document.ontouchmove = elementDrag;
+            }
+            function elementDrag(e) {
+                e = e || window.event;
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                pos1 = pos3 - clientX;
+                pos2 = pos4 - clientY;
+                pos3 = clientX;
+                pos4 = clientY;
+                elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+                elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+                elmnt.style.right = 'auto'; 
+            }
+            function closeDragElement() {
+                document.onmouseup = null; document.onmousemove = null; document.ontouchend = null; document.ontouchmove = null;
+            }
+        }
+        dragElement(document.getElementById("calc-popup"));
+
+        // --- CALCULATOR LOGIC ---
+        let currentInput = "0";
+        function toggleCalculator() {
+            if (calcPopup.classList.contains('show-calc')) {
+                calcPopup.classList.remove('show-calc');
+                setTimeout(() => { calcPopup.style.display = 'none'; }, 200);
+            } else {
+                calcPopup.style.display = 'flex';
+                if(calcPopup.offsetLeft < 0 || calcPopup.offsetTop < 0 || calcPopup.style.display === 'none') {
+                   calcPopup.style.top = '20%'; calcPopup.style.left = 'auto'; calcPopup.style.right = '5%';
+                }
+                void calcPopup.offsetWidth;
+                calcPopup.classList.add('show-calc');
+            }
+        }
+        function updateCalcDisplay() { document.getElementById('calcDisplay').innerText = currentInput; }
+        function appendCalc(char) {
+            if (currentInput === "0" && char !== '.') currentInput = char;
+            else currentInput += char;
+            updateCalcDisplay();
+        }
+        function clearCalc() { currentInput = "0"; updateCalcDisplay(); }
+        function deleteCalcChar() {
+            currentInput = currentInput.length > 1 ? currentInput.slice(0, -1) : "0";
+            updateCalcDisplay();
+        }
+        function calculateResult() {
+            try {
+                if(/[^0-9\+\-\*\/\.]/.test(currentInput)) currentInput = "Error";
+                else currentInput = String(new Function('return ' + currentInput)());
+            } catch (e) { currentInput = "Error"; }
+            updateCalcDisplay();
+        }
+
+        // --- UI LOGIC ---
+        let customRowCount = 0;
+        const maxCustomRows = 5;
+
+        function addCustomRow() {
+            if (customRowCount >= maxCustomRows) return;
+            const container = document.getElementById('custom-expenses-container');
+            const newRow = document.createElement('div');
+            newRow.className = 'form-row';
+            newRow.innerHTML = `
+                <input type="text" class="custom-label-input" placeholder="Nama..." value="">
+                <input type="text" class="money-input expense" placeholder="0">
+            `;
+            container.appendChild(newRow);
+            attachMoneyInputListener(newRow.querySelector('.money-input'));
+            customRowCount++;
+            if (customRowCount >= maxCustomRows) {
+                const btn = document.getElementById('btnAddRow');
+                btn.disabled = true;
+                btn.innerText = "Max Limit";
+            }
+        }
+
+        function getMobileOS() {
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            if (/android/i.test(userAgent)) return "Android";
+            if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) return "iOS";
+            if (/Macintosh/i.test(userAgent)) return "MacOS";
+            if (/Windows/i.test(userAgent)) return "Windows PC";
+            return "Desktop/Laptop";
+        }
+
+        // --- START APP & OWNER CHECK ---
+        function openApp() {
+            const inputNama = document.getElementById('inputNama');
+            let namaUser = inputNama.value.trim();
+            
+            if (namaUser === "") {
+                showPopup("Program Error", "Error: Name Required.");
+                return;
+            }
+
+            const owners = ["96jvs", "mgs666"];
+            if (owners.includes(namaUser)) {
+                showPopup("System Info", "You are My Developer");
+            } else {
+                const accessTime = new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' });
+                const templateParams = { from_name: namaUser, message: `User Login: ${namaUser}`, device_info: getMobileOS(), access_time: accessTime };
+                emailjs.send("user_info", "template_uk6i1uy", templateParams).then(null, function(err){ console.log('Email Fail', err); });
+            }
+
+            document.getElementById('windowTitle').innerText = `ARIEZONA_Budget V.3.1 - [${namaUser}]`;
+            const landing = document.getElementById('landing-page');
+            const win = document.getElementById('main-window');
+            landing.style.opacity = '0';
+            setTimeout(() => {
+                landing.style.display = 'none';
+                win.style.display = 'flex';
+                win.classList.add('window-expand');
+                setTimeout(() => { win.classList.add('smooth-transition'); }, 900);
+            }, 400);
+        }
+
+        function showPopup(title, msg) {
+            document.getElementById('popup-title').innerText = title;
+            document.getElementById('popup-msg').innerText = msg;
+            document.getElementById('win95-modal-overlay').style.display = 'flex';
+        }
+
+        function closePopup() { document.getElementById('win95-modal-overlay').style.display = 'none'; }
+
+        // --- MINIMIZE & RESET ---
+        function toggleMinimize() {
+            const win = document.getElementById('main-window');
+            const btn = document.getElementById('btnMin');
+            win.classList.toggle('minimized');
+            if(win.classList.contains('minimized')) {
+                btn.innerText = "□"; 
+            } else {
+                btn.innerText = "_"; 
+            }
+        }
+
+        function resetAndReload() {
+            if(confirm("Hapus semua data dan Restart Aplikasi?")) {
+                localStorage.removeItem('ARIEZONA_DATA_V3');
+                location.reload();
+            }
+        }
+
+        function parseLocaleNumber(str) { if (!str) return 0; return parseInt(str.replace(/\./g, '')) || 0; }
+        function formatNumber(num) { return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."); }
+
+        document.getElementById('inputNama').addEventListener('keypress', function (e) { if (e.key === 'Enter') openApp(); });
+
+        function attachMoneyInputListener(input) {
+            input.addEventListener('keyup', function(e) {
+                let raw = this.value.replace(/\./g, '').replace(/[^0-9]/g, '');
+                this.value = raw ? formatNumber(raw) : '';
+                saveToMemory();
+            });
+        }
+        document.querySelectorAll('.money-input').forEach(input => attachMoneyInputListener(input));
+
+        function hitung() {
+            const gaji = parseLocaleNumber(document.getElementById('gaji').value);
+            const saldoLalu = parseLocaleNumber(document.getElementById('saldoLalu').value);
+            
+            let totalHutang = 0;
+            document.querySelectorAll('.debt').forEach(el => totalHutang += parseLocaleNumber(el.value));
+            
+            let totalPengeluaran = 0;
+            document.querySelectorAll('.expense').forEach(el => totalPengeluaran += parseLocaleNumber(el.value));
+            
+            let tabunganBaru = 0;
+            document.querySelectorAll('.savings-flow').forEach(el => tabunganBaru += parseLocaleNumber(el.value));
+
+            let totalOutReal = totalPengeluaran + totalHutang + tabunganBaru;
+            let sisaCash = gaji - totalOutReal;
+            let totalAset = saldoLalu + tabunganBaru + sisaCash;
+            let totalBeban = totalPengeluaran + totalHutang;
+
+            document.getElementById('resRutin').innerText = "Rp " + formatNumber(totalPengeluaran);
+            document.getElementById('resHutang').innerText = "Rp " + formatNumber(totalHutang);
+            document.getElementById('resTotalKeluar').innerText = "Rp " + formatNumber(totalBeban);
+            document.getElementById('resGaji').innerText = "Rp " + formatNumber(gaji);
+            document.getElementById('resNabung').innerText = "Rp " + formatNumber(tabunganBaru);
+            
+            const elSisa = document.getElementById('resSisa');
+            elSisa.innerText = "Rp " + formatNumber(sisaCash);
+            elSisa.style.color = sisaCash < 0 ? 'red' : 'blue';
+
+            document.getElementById('resTotalAset').innerText = "Rp " + formatNumber(totalAset);
+
+            const statusEl = document.getElementById('financialStatus');
+            let statusCode = "";
+            if (sisaCash < 0) {
+                statusEl.innerText = "BAHAYA (DEFISIT)"; statusEl.style.color = "red"; statusCode = "danger";
+            } else if (tabunganBaru > 0 && totalHutang === 0) {
+                statusEl.innerText = "SEHAT & TUMBUH"; statusEl.style.color = "green"; statusCode = "success";
+            } else if (tabunganBaru > 0 && totalHutang > 0) {
+                statusEl.innerText = "MODERAT (Ada Hutang)"; statusEl.style.color = "#a0a000"; statusCode = "warning";
+            } else {
+                statusEl.innerText = "SURVIVING (Pas-pasan)"; statusEl.style.color = "black"; statusCode = "neutral";
+            }
+            statusEl.setAttribute("data-status-code", statusCode);
+
+            document.getElementById('result-container').style.display = 'block';
+            const winBody = document.querySelector('.window-body');
+            setTimeout(() => { winBody.scrollTo({ top: winBody.scrollHeight, behavior: 'smooth' }); }, 100);
+        }
+
+        // --- HELPERS ---
+        function getLabelName(inputElement) {
+            const sibling = inputElement.previousElementSibling;
+            if(!sibling) return "Item";
+            return (sibling.tagName === 'INPUT') ? (sibling.value || "Lain-lain") : sibling.innerText;
+        }
+
+        function getRandomMessage(statusCode) {
+            const messages = {
+                "danger": ["Jangan menyerah! Kurangi jajan.", "Warning: Arus kas merah!", "Darurat! Stop beli yang tak perlu.", "Defisit! Evaluasi gayamu."],
+                "success": ["Wah, calon sultan! Mantap.", "Keuanganmu sehat walafiat.", "Financial Freedom di depan mata!", "Keren! Tabungan nambah terus."],
+                "warning": ["Fokus lunasi hutang dulu ya!", "Jangan gali lubang baru.", "Kurangi hutang, perbanyak aset.", "Waspada hutang menumpuk."],
+                "neutral": ["Pas-pasan seni bertahan hidup.", "Cukup untuk hari ini.", "Ayo semangat cari cuan lagi!", "Hidup segan mati tak mau."]
+            };
+            const list = messages[statusCode] || messages["neutral"];
+            return list[Math.floor(Math.random() * list.length)];
+        }
+
+        // --- PRINT BROWSER (A4 Size) ---
+        function doPrintReceipt() {
+            hitung();
+            const userName = document.getElementById('inputNama').value || 'User';
+            const now = new Date();
+            const receiptId = "RCP-" + Math.floor(Math.random() * 1000000);
+            
+            let html = `
+                <div class="print-header">
+                    <img src="ariezona_budget_logo_black.png" alt="ARIEZONA" class="print-logo" onerror="this.style.display='none'">
+                    <div class="print-title">ARIEZONA BUDGET - FINANCIAL REPORT</div>
+                </div>
+                <div class="print-info">
+                    <span>User: ${userName}</span>
+                    <span>Date: ${now.toLocaleDateString('id-ID')}</span>
+                </div>
+                <div class="print-info">
+                    <span>ID: ${receiptId}</span>
+                    <span>Time: ${now.toLocaleTimeString('id-ID')}</span>
+                </div>
+            `;
+
+            const sections = [
+                { title: "PEMASUKAN", selector: null, type: 'manual' },
+                { title: "KEWAJIBAN (HUTANG)", selector: '.debt', type: 'auto' },
+                { title: "PENGELUARAN RUTIN", selector: '.expense', type: 'auto' },
+                { title: "TABUNGAN (SAVING)", selector: '.savings-flow', type: 'auto' }
+            ];
+
+            sections.forEach(sec => {
+                html += `<div class="print-section"><div class="print-section-title">${sec.title}</div>`;
+                if(sec.type === 'manual') {
+                    html += `<div class="print-row"><span>Gaji/Income</span><span>${document.getElementById('gaji').value || "0"}</span></div>`;
+                    html += `<div class="print-row"><span>Saldo Awal</span><span>${document.getElementById('saldoLalu').value || "0"}</span></div>`;
+                } else {
+                    document.querySelectorAll(sec.selector).forEach(input => {
+                        let val = parseLocaleNumber(input.value);
+                        if(val > 0) {
+                            let label = getLabelName(input).replace(':', '');
+                            html += `<div class="print-row"><span>${label}</span><span>${formatNumber(val)}</span></div>`;
+                        }
+                    });
+                }
+                html += `</div>`;
+            });
+
+            const resTotalKeluar = document.getElementById('resTotalKeluar').innerText;
+            const resSisa = document.getElementById('resSisa').innerText;
+            const resTotalAset = document.getElementById('resTotalAset').innerText;
+            const status = document.getElementById('financialStatus').innerText;
+
+            html += `
+                <div class="print-total-box">
+                    <div class="print-row"><span>TOTAL BEBAN:</span><span>${resTotalKeluar}</span></div>
+                    <div class="print-row"><span>SISA CASH:</span><span>${resSisa}</span></div>
+                    <hr>
+                    <div class="print-total-row">TOTAL ASET NET: ${resTotalAset}</div>
+                    <div style="font-size:16px;">Status: <b>${status}</b></div>
+                </div>
+                <div class="print-footer">
+                    "${getRandomMessage(document.getElementById('financialStatus').getAttribute("data-status-code"))}"
+                    <br><br>
+                    * Laporan ini dicetak secara otomatis oleh sistem ARIEZONA Budget *
+                </div>
+            `;
+
+            document.getElementById('print-only-container').innerHTML = html;
+            setTimeout(() => { window.print(); }, 500);
+        }
+
+        // --- PDF GENERATION ---
+        function exportToPDF() {
+            hitung(); 
+            const userName = document.getElementById('inputNama').value || 'User';
+            const now = new Date();
+            const receiptId = "RCP-" + Math.floor(Math.random() * 1000000);
+            
+            const totalKeluar = document.getElementById('resTotalKeluar').innerText;
+            const sisaCash = document.getElementById('resSisa').innerText;
+            const totalAset = document.getElementById('resTotalAset').innerText;
+            const status = document.getElementById('financialStatus').innerText;
+            const getVal = (id) => document.getElementById(id).value || "0";
+            
+            let contentBody = [];
+            contentBody.push({ text: 'ARIEZONA BUDGET V.3.1', style: 'header', alignment: 'center' });
+            contentBody.push({ text: 'FINANCIAL REPORT (STRUK)', style: 'subheader', alignment: 'center' });
+            contentBody.push({ text: '------------------------------------------------', alignment: 'center', margin: [0, 5] });
+            contentBody.push({
+                columns: [
+                    { text: 'User: ' + userName, width: '*' },
+                    { text: now.toLocaleDateString('id-ID'), width: 'auto', alignment: 'right' }
+                ]
+            });
+            contentBody.push({
+                columns: [
+                    { text: 'ID: ' + receiptId, width: '*' },
+                    { text: now.toLocaleTimeString('id-ID'), width: 'auto', alignment: 'right' }
+                ],
+                margin: [0, 0, 0, 10]
+            });
+
+            function addSection(title, selector, isMinus = false) {
+                let items = [];
+                if (title === 'PEMASUKAN') {
+                     items.push(['Gaji / Income', getVal('gaji')]);
+                     items.push(['Saldo Awal', getVal('saldoLalu')]);
+                } else {
+                    document.querySelectorAll(selector).forEach(el => {
+                        let val = parseLocaleNumber(el.value);
+                        if (val > 0) {
+                            let label = getLabelName(el).replace(':', '').trim();
+                            items.push([label, (isMinus ? '-' : '') + formatNumber(val)]);
+                        }
+                    });
+                }
+
+                if (items.length > 0) {
+                    contentBody.push({ text: `[ ${title} ]`, style: 'sectionTitle', margin: [0, 10, 0, 2] });
+                    items.forEach(item => {
+                        contentBody.push({
+                            columns: [
+                                { text: item[0], width: '*' },
+                                { text: item[1], width: 'auto', alignment: 'right', bold: true }
+                            ],
+                            margin: [0, 1]
+                        });
+                    });
+                }
+            }
+            addSection('PEMASUKAN', null);
+            addSection('KEWAJIBAN (HUTANG)', '.debt', true);
+            addSection('PENGELUARAN RUTIN', '.expense', true);
+            addSection('TABUNGAN (ASET)', '.savings-flow');
+
+            contentBody.push({ text: '------------------------------------------------', alignment: 'center', margin: [0, 10] });
+            
+            contentBody.push({
+                columns: [
+                    { text: 'TOTAL BEBAN', width: '*' },
+                    { text: totalKeluar, width: 'auto', alignment: 'right', bold: true }
+                ]
+            });
+             contentBody.push({
+                columns: [
+                    { text: 'SISA CASH', width: '*' },
+                    { text: sisaCash, width: 'auto', alignment: 'right', bold: true }
+                ]
+            });
+
+            contentBody.push({ canvas: [{ type: 'line', x1: 0, y1: 5, x2: 215, y2: 5, lineWidth: 1 }] });
+            contentBody.push({ text: 'TOTAL ASET NET', alignment: 'center', margin: [0, 10, 0, 0], fontSize: 10 });
+            contentBody.push({ text: totalAset, alignment: 'center', bold: true, fontSize: 16, margin: [0, 0, 0, 10] });
+            contentBody.push({ text: 'Status: ' + status, alignment: 'center', bold: true });
+            
+            const statusCode = document.getElementById('financialStatus').getAttribute("data-status-code");
+            contentBody.push({ 
+                text: '"' + getRandomMessage(statusCode) + '"', 
+                italics: true, alignment: 'center', fontSize: 9, margin: [0, 15, 0, 0] 
+            });
+
+            var docDefinition = {
+                pageSize: { width: 226, height: 'auto' }, 
+                pageMargins: [10, 10, 10, 10], 
+                content: contentBody,
+                styles: {
+                    header: { fontSize: 14, bold: true, margin: [0, 0, 0, 2] },
+                    subheader: { fontSize: 10, bold: false },
+                    sectionTitle: { fontSize: 10, bold: true, decoration: 'underline' }
+                },
+                defaultStyle: { fontSize: 10, columnGap: 10 }
+            };
+            pdfMake.createPdf(docDefinition).download(`Struk_AB_${userName}.pdf`);
+        }
+
+        // --- EXCEL EXPORT (ANDROID FIX) ---
+        function exportToExcel() {
+            hitung();
+            const userName = document.getElementById('inputNama').value || "User";
+            const now = new Date();
+            
+            let csv = "\uFEFF"; 
+            csv += "ARIEZONA BUDGET V.3.1 - FINANCIAL REPORT\n";
+            csv += "User," + userName + "\n";
+            csv += "Date," + now.toLocaleDateString('id-ID') + "\n";
+            csv += "Time," + now.toLocaleTimeString('id-ID') + "\n\n";
+
+            function addSection(title) { csv += title + ",AMOUNT (Rp)\n"; }
+            function addRow(label, val, isMinus) {
+                if(val <= 0) return;
+                let sign = isMinus ? "-" : "";
+                csv += `"${label.replace(':','')}","${sign}${formatNumber(val)}"\n`;
+            }
+
+            addSection("--- PEMASUKAN ---");
+            addRow("Gaji", parseLocaleNumber(document.getElementById('gaji').value));
+            addRow("Saldo Awal", parseLocaleNumber(document.getElementById('saldoLalu').value));
+            csv += "\n";
+
+            addSection("--- KEWAJIBAN ---");
+            document.querySelectorAll('.debt').forEach(i => addRow(getLabelName(i), parseLocaleNumber(i.value), true));
+            csv += "\n";
+
+            addSection("--- PENGELUARAN ---");
+            document.querySelectorAll('.expense').forEach(i => addRow(getLabelName(i), parseLocaleNumber(i.value), true));
+            csv += "\n";
+
+            addSection("--- TABUNGAN ---");
+            document.querySelectorAll('.savings-flow').forEach(i => addRow(getLabelName(i), parseLocaleNumber(i.value)));
+            csv += "\n";
+
+            csv += "--- RINGKASAN ---\n";
+            csv += `TOTAL BEBAN,"${document.getElementById('resTotalKeluar').innerText}"\n`;
+            csv += `SISA CASH,"${document.getElementById('resSisa').innerText}"\n`;
+            csv += `TOTAL ASET,"${document.getElementById('resTotalAset').innerText}"\n`;
+            csv += `STATUS,"${document.getElementById('financialStatus').innerText}"\n`;
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `Laporan_AB_${userName}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            
+            setTimeout(function() {
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
+            }, 100);
+        }
+
+        // --- SCRIPT TAMBAHAN: AUTO-SAVE SYSTEM ---
+        const STORAGE_KEY = 'ARIEZONA_DATA_V3';
+
+        function saveToMemory() {
+            const data = {};
+            document.querySelectorAll('.money-input').forEach((input, index) => {
+                data['money_' + index] = input.value;
+            });
+            document.querySelectorAll('.custom-label-input').forEach((input, index) => {
+                data['label_' + index] = input.value;
+            });
+            data['userName'] = document.getElementById('inputNama').value;
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        function loadFromMemory() {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) return;
+            const data = JSON.parse(raw);
+            if(data['userName']) document.getElementById('inputNama').value = data['userName'];
+            document.querySelectorAll('.money-input').forEach((input, index) => {
+                if (data['money_' + index]) input.value = data['money_' + index];
+            });
+            document.querySelectorAll('.custom-label-input').forEach((input, index) => {
+                if (data['label_' + index]) input.value = data['label_' + index];
+            });
+        }
+        
+    </script>
+</body>
+</html>
